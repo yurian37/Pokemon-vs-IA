@@ -1,0 +1,18 @@
+{
+  "game": "Guess_Character",
+  "rounds_per_player": 3,
+  "enable_timer": true,
+  "timer_seconds": 30,
+  "media_pool": [
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnDHp_JNdSKgHoH08CxQf262wZUa5BGovrRuT8sW2GRA&s=10",
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNevSOhbrrbq-esILqKDLV5xe0is2qyVik-63sTQKz_A&s=10",
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTd4tJYtPZn4xjqTu5rJxaIU4RqwVuVuPLR_Dz_PF6ObQ&s=10",
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTRKAdMf5Lc-0HNcowD4mQJxjUSKgoVf9D9l6QoSX6-rA&s=10",
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Nosferatu_Shadow.jpg/800px-Nosferatu_Shadow.jpg",
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxDUiyZrlRlB83x5zSlo4KgtqnGKW-HZEpOorR1rUdLw&s=10",
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQ9HPrifxVKznHsK0qcElomDj2w-Y9PUs-rZQg53S-nQ&s=10",
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPbEmVnMDS6sKU5pRtfXMSbKBoBzhDUaMV6d5Q4nSfYA&s=10",
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7b85DsiXhCHUIqzQ8jFZphO7S9jtgLdQdA8UhRXjnkg&s=10",
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV87HBunee4ZnxxZHJrNb-4jVR1BzF-RN-J_UltRiTvw&s=10"
+  ]
+}
