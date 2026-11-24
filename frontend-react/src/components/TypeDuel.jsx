@@ -179,7 +179,7 @@ export default function TypeDuel({ onBackToHub }) {
               PERSECUCIÓN EN VIVO
             </span>
             <h2 className="font-display font-extrabold text-lg sm:text-xl text-[#111827]">
-              La IA arrancó +5 arriba por tramposa. ¡Cázala!
+              La máquina empezó con 5 puntos de ventaja. ¡Alcánzala!
             </h2>
           </div>
 
@@ -196,7 +196,7 @@ export default function TypeDuel({ onBackToHub }) {
           {/* Carril IA */}
           <div>
             <div className="flex justify-between font-mono text-xs font-extrabold mb-1">
-              <span className="text-[#D9383A]">BOT TRAMPOSO (IA)</span>
+              <span className="text-[#D9383A]">RIVAL (MÁQUINA)</span>
               <span className="text-[#111827]">{aiScore} PTS</span>
             </div>
             <div className="w-full h-7 bg-[#F4EFE2] border-[2.5px] border-[#111827] rounded-xl overflow-hidden relative p-0.5">
@@ -247,7 +247,7 @@ export default function TypeDuel({ onBackToHub }) {
           <div className="absolute inset-0 bg-halftone-light opacity-45 pointer-events-none" />
 
           <span className="relative z-10 arcade-stamp bg-[#FFD43B] text-[#111827] font-mono text-[11px] font-extrabold uppercase px-3 py-1 rounded-xl">
-            {roundStatus === 'waiting_user' ? '¿DE QUÉ CARAJOS ES ESTE BICHO?' : 'IDENTIDAD REVELADA'}
+            {roundStatus === 'waiting_user' ? '¿DE QUÉ TIPO ES ESTE POKÉMON?' : 'IDENTIDAD REVELADA'}
           </span>
 
           <div className="relative z-10 w-52 h-52 my-4 rounded-2xl bg-[#FFFDF7] border-[3px] border-[#111827] shadow-ink flex items-center justify-center p-3">
@@ -352,7 +352,7 @@ export default function TypeDuel({ onBackToHub }) {
           {/* TERMINAL DE TURNO DE LA IA */}
           {roundStatus === 'ai_turn' && (
             <div className="arcade-panel-dark text-[#FFD43B] rounded-2xl p-4 font-mono text-xs font-extrabold animate-pulse">
-              La IA está analizando los píxeles del bicho con sus 2 intentos...
+              La máquina está evaluando sus 2 intentos...
             </div>
           )}
 
@@ -392,7 +392,7 @@ export default function TypeDuel({ onBackToHub }) {
                   onClick={handleNextRound}
                   className="arcade-btn w-full py-3 rounded-xl bg-[#111827] hover:bg-[#1E3A5F] text-[#FFD43B] font-display font-extrabold text-sm uppercase cursor-pointer mt-1"
                 >
-                  Siguiente Bicho [Enter] →
+                  Siguiente Pokémon [Enter] →
                 </button>
               )}
             </div>
@@ -405,13 +405,13 @@ export default function TypeDuel({ onBackToHub }) {
         <div className="fixed inset-0 bg-[#111827]/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn">
           <div className="arcade-panel rounded-3xl p-6 sm:p-8 max-w-md w-full text-center animate-popIn">
             <span className="arcade-stamp inline-block bg-[#16A34A] text-white font-mono text-xs font-extrabold uppercase px-3 py-1 rounded-lg -rotate-2 mb-3">
-              CAZASTE A LA MÁQUINA
+              ¡VICTORIA!
             </span>
             <h3 className="font-display font-extrabold text-3xl text-[#111827] uppercase">
-              ¡Le callaste el hocico a la IA!
+              ¡Alcanzaste a la Máquina!
             </h3>
             <p className="text-xs sm:text-sm font-semibold text-slate-700 mt-1.5">
-              Le remontaste los 5 puntos de ventaja tramposa y la dejaste comiendo polvo en {roundNumber} rondas.
+              ¡Gran remontada! Superaste los 5 puntos de ventaja iniciales en {roundNumber} rondas.
             </p>
 
             <div className="grid grid-cols-3 gap-2 my-5">

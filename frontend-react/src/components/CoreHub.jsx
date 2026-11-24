@@ -12,57 +12,57 @@ export default function CoreHub({ onNavigate, onOpenLegal, selectedBgType, onSel
     {
       id: 'stat-battle',
       num: '01',
-      title: '¿Quién la tiene más grande?',
-      subtitle: 'Duelo de Stats a Muerte Súbita',
-      desc: 'Dos bichos cara a cara y una stat al azar. Adivina cuál pega más duro o aguanta más palo. Si fallas, te vas directo al carajo.',
-      badge: 'SIN PIEDAD',
-      modelTag: 'PokéAPI + Racha',
+      title: '¿Quién tiene más?',
+      subtitle: 'Duelo de Estadísticas',
+      desc: 'Dos Pokémon cara a cara y una estadística al azar. Adivina cuál tiene el número más alto. Si fallas, termina la partida.',
+      badge: 'SUPERVIVENCIA',
+      modelTag: 'Racha Continua',
       typeTheme: 'Fighting',
-      cta: 'Entrar al Ring',
+      cta: 'Iniciar Duelo',
     },
     {
       id: 'type-duel',
       num: '02',
-      title: '¿De qué carajos es este bicho?',
-      subtitle: 'Tablero Alcánzame vs IA Tramposa',
-      desc: 'Solo ves la silueta/imagen sin nombre. La IA arranca con +5 puntos de ventaja por descarada y tiene 2 tiros. Cázala o trágate el orgullo.',
-      badge: 'PERSECUCIÓN',
-      modelTag: 'Visión + 2 Tiros IA',
+      title: '¿De qué tipo es?',
+      subtitle: 'Modo Carrera vs Máquina',
+      desc: 'Solo ves la imagen del Pokémon sin su nombre. La máquina arranca con 5 puntos de ventaja y tiene 2 intentos. ¡Acierta y alcánzala para ganar!',
+      badge: 'ALCÁNZAME',
+      modelTag: 'Rival con 2 Tiros',
       typeTheme: 'Electric',
-      cta: 'Cazar a la IA',
+      cta: 'Jugar Alcánzame',
     },
     {
       id: 'type-betting',
       num: '03',
-      title: 'El tipo sí importa, no jodas',
-      subtitle: 'Casino Clandestino de 15 Fichas',
-      desc: 'Un tipo en la mira, 3 bichos sospechosos. Suelta 5 fichas por ronda contra la banca infinita de la IA. Triplica (x3) en su cara o queda pelado.',
+      title: 'El tipo sí importa',
+      subtitle: 'Mesa de Apuestas de 15 Fichas',
+      desc: 'Un tipo elemental y 3 opciones. Reparte tus 5 fichas por ronda contra las elecciones del rival. Si aciertas, multiplica tus fichas según la jugada rival.',
       badge: 'APUESTAS x3',
-      modelTag: 'Apuesta 3/2 IA',
+      modelTag: 'Apuesta 3/2 Rival',
       typeTheme: 'Dark',
-      cta: 'Tirar Fichas',
+      cta: 'Apostar Fichas',
     },
     {
       id: 'type-analysis',
       num: '04',
-      title: '¿A qué huele este engendro?',
-      subtitle: 'Escáner de Aura Elemental',
-      desc: 'Sube la foto de un Pokémon, tu perro o cualquier mamarracho. La red neuronal le saca los colores y te suelta el Top 5 en barras o dona.',
-      badge: 'RAYOS X IA',
-      modelTag: 'Red Keras + Aura',
+      title: 'Análisis de Tipos Pokémon',
+      subtitle: 'Escáner de Tipo Elemental',
+      desc: 'Sube una imagen y el sistema calculará los 5 tipos más afines según sus colores y forma, en gráfico de barras o circular.',
+      badge: 'TOP 5 AFINIDAD',
+      modelTag: 'Reconocimiento Visual',
       typeTheme: 'Psychic',
-      cta: 'Escanear Ahora',
+      cta: 'Escanear Imagen',
     },
     {
       id: 'create-pokemon',
       num: '05',
-      title: 'Laboratorio de Monstruosidades',
-      subtitle: 'Forja tu Bicho con KNN Dopado',
-      desc: 'Sube una jeta, inyéctale tipos y deja huecos en las stats: nuestro KNN (k=5) con doble fuerza te calcula los números faltantes y pare tu carta.',
-      badge: 'BIO-FORJA KNN',
-      modelTag: 'KNN Logístico k=5',
+      title: 'Crea a tu Pokémon',
+      subtitle: 'Taller Creativo con Predicción',
+      desc: 'Sube tu diseño, elige sus tipos y define sus estadísticas. Si dejas valores vacíos, el sistema inteligente estimará los datos faltantes.',
+      badge: 'CREADOR OFICIAL',
+      modelTag: 'Cálculo Inteligente',
       typeTheme: 'Dragon',
-      cta: 'Forjar Criatura',
+      cta: 'Crear Pokémon',
     },
   ], []);
 
@@ -200,7 +200,7 @@ export default function CoreHub({ onNavigate, onOpenLegal, selectedBgType, onSel
                   className="bg-white/95 hover:bg-[#FFD43B] text-[#111827] border-[1.5px] border-[#111827] px-2 py-0.5 rounded-lg font-mono text-[10px] font-extrabold cursor-pointer transition-colors"
                   title="Ver otro espécimen aleatorio"
                 >
-                  ↻ Otro Bicho
+                  ↻ Otro Pokémon
                 </button>
               </div>
 
@@ -298,7 +298,7 @@ export default function CoreHub({ onNavigate, onOpenLegal, selectedBgType, onSel
             ) : (
               <div>
                 <span className="font-mono text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-[#111827] text-[#FFD43B]">
-                  EL NÚCLEO • 1,215 BICHOS
+                  CENTRO DE JUEGOS • 1,215 POKÉMON
                 </span>
                 <p className="text-[11px] font-bold text-slate-600 mt-1">
                   Elige tu duelo alrededor

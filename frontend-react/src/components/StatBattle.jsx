@@ -198,7 +198,7 @@ export default function StatBattle({ onBackToHub }) {
               onClick={() => handleGuess(side)}
               className="arcade-btn w-full py-3.5 px-4 rounded-2xl bg-[#FFD43B] hover:bg-[#FFE066] text-[#111827] font-display font-extrabold text-sm sm:text-base uppercase tracking-wide flex items-center justify-between gap-2 cursor-pointer"
             >
-              <span className="truncate">¡{pokemon.name} pega más!</span>
+              <span className="truncate">¡{pokemon.name} tiene más!</span>
               <span className="font-mono text-[11px] bg-[#111827] text-[#FFD43B] px-2 py-0.5 rounded-md shrink-0">
                 [{hotkey}]
               </span>
@@ -226,7 +226,7 @@ export default function StatBattle({ onBackToHub }) {
 
         <div className="flex flex-wrap items-center gap-2">
           <span className="arcade-stamp bg-[#D9383A] text-white px-3 py-1 rounded-xl font-mono text-xs font-extrabold uppercase">
-            MODO 01 • ¿QUIÉN LA TIENE MÁS GRANDE?
+            MODO 01 • ¿QUIÉN TIENE MÁS?
           </span>
           {streakBadge && (
             <span className="arcade-stamp bg-[#FFD43B] text-[#111827] px-2.5 py-1 rounded-xl font-mono text-[11px] font-extrabold animate-bounce">
@@ -288,8 +288,8 @@ export default function StatBattle({ onBackToHub }) {
         >
           <p className="font-display font-extrabold text-lg text-[#111827]">
             {lastComparison.isCorrect
-              ? '¡TOMA YA! Le diste al clavo (+1 Racha). El de la derecha pasa a defender.'
-              : '¡LA CAGASTE! Esa no era ni de cerca...'}
+              ? '¡Correcto! (+1 Punto). El Pokémon de la derecha pasa a la izquierda.'
+              : '¡Fallaste! Ese valor era menor...'}
           </p>
           <p className="font-mono text-xs font-bold text-slate-800 mt-0.5">
             {pokemonLeft.name} ({lastComparison.valLeft}) vs {pokemonRight.name} ({lastComparison.valRight})
@@ -302,10 +302,10 @@ export default function StatBattle({ onBackToHub }) {
         <div className="fixed inset-0 bg-[#111827]/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn">
           <div className="arcade-panel rounded-3xl p-6 sm:p-8 max-w-md w-full text-center animate-popIn">
             <span className="arcade-stamp inline-block bg-[#D9383A] text-white font-mono text-xs font-extrabold uppercase px-3 py-1 rounded-lg -rotate-2 mb-3">
-              NOCAUT TÉCNICO
+              FIN DE LA PARTIDA
             </span>
             <h3 className="font-display font-extrabold text-3xl text-[#111827] uppercase">
-              ¡Te fuiste al carajo!
+              ¡Fin de la Racha!
             </h3>
             <p className="text-xs sm:text-sm font-semibold text-slate-700 mt-1.5">
               Te confiaste y te volaron la racha en pedazos. ¿Vas a llorar o pides revancha de una vez?

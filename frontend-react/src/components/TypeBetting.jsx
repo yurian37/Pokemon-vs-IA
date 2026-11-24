@@ -205,7 +205,7 @@ export default function TypeBetting({ onBackToHub }) {
                 TIPO {TYPE_ES[currentRoundData.targetType] || currentRoundData.targetType}
               </h2>
               <p className="text-xs font-semibold text-white/95 max-w-md mt-0.5">
-                Solo 1 de los 3 bichos tiene este tipo. Reparte tus 5 fichas. La IA siempre tira 3 a su favorita y 2 a la segunda.
+                Solo 1 de los 3 Pokémon tiene este tipo. Reparte tus 5 fichas. El rival siempre coloca 3 en su primera opción y 2 en la segunda.
               </p>
             </div>
           </div>
@@ -257,7 +257,7 @@ export default function TypeBetting({ onBackToHub }) {
               totalBet === 5 ? 'bg-[#16A34A] text-white' : 'bg-slate-200 text-slate-500'
             }`}
           >
-            {totalBet === 5 ? '¡Soltar las 5 Fichas y Destapar!' : `Te faltan ${remainingToPlace} fichas`}
+            {totalBet === 5 ? '¡Apostar 5 Fichas y Revelar!' : `Te faltan ${remainingToPlace} fichas`}
           </button>
         </div>
       )}
@@ -296,7 +296,7 @@ export default function TypeBetting({ onBackToHub }) {
                       isCorrect ? 'bg-[#4ADE80] text-[#111827]' : 'bg-[#FFE3E3] text-[#991B1B]'
                     }`}
                   >
-                    {isCorrect ? '¡EL VERDADERO!' : 'PURA FARSA'}
+                    {isCorrect ? '¡TIPO CORRECTO!' : 'TIPO INCORRECTO'}
                   </span>
                 )}
               </div>
@@ -393,8 +393,8 @@ export default function TypeBetting({ onBackToHub }) {
           <div>
             <h4 className="font-display font-extrabold text-lg text-[#111827]">
               {roundResult.userWonThisRound > 0
-                ? `¡Te embolsaste +${roundResult.userWonThisRound} fichas limpias!`
-                : 'No pusiste ni una ficha en el bicho real. Perdiste la apuesta.'}
+                ? `¡Ganaste +${roundResult.userWonThisRound} fichas en esta ronda!`
+                : 'No colocaste fichas en el Pokémon correcto.'}
             </h4>
             <p className="font-mono text-xs font-bold text-slate-700 mt-0.5">
               Multiplicador: <span className="text-[#D9383A]">{roundResult.multiplierText}</span> • La IA puso {roundResult.aiPlacedCorrect} fichas en la correcta.

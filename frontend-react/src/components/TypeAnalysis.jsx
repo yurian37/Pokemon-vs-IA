@@ -107,13 +107,13 @@ export default function TypeAnalysis({ onBackToHub }) {
       {/* TÍTULO */}
       <div className="arcade-panel rounded-3xl p-4 sm:p-5 text-center">
         <span className="font-mono text-[10px] font-extrabold uppercase tracking-widest text-[#D9383A]">
-          VISIÓN DE IA SIN FILTROS • TOP 5 DE PERTENENCIA
+          ANÁLISIS DE IMAGEN • TOP 5 DE AFINIDAD
         </span>
         <h2 className="font-display font-extrabold text-2xl sm:text-4xl text-[#111827] mt-1">
-          ¿A qué puto tipo huele este engendro?
+          ¿De qué tipo parece esta criatura?
         </h2>
         <p className="text-xs sm:text-sm font-semibold text-slate-700 mt-1 max-w-2xl mx-auto">
-          Sube la foto de un Pokémon, tu mascota o tu propia jeta. El modelo destripa los colores y rasgos visuales y te escupe el Top 5 de afinidad elemental.
+          Sube la foto de un Pokémon, tu mascota o cualquier diseño. El modelo analiza los colores y rasgos visuales para mostrarte el Top 5 de afinidad elemental.
         </p>
       </div>
 
@@ -189,7 +189,7 @@ export default function TypeAnalysis({ onBackToHub }) {
                 IA
               </div>
               <p className="font-display font-extrabold text-lg text-[#111827]">
-                Destripando píxeles y calculando aura...
+                Analizando la imagen y calculando afinidad...
               </p>
             </div>
           )}

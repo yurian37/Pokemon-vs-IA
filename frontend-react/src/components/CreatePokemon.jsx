@@ -12,7 +12,7 @@ export default function CreatePokemon({ onBackToHub }) {
 
   // 5.1 Imagen + Nombre
   const [pokeImage, setPokeImage] = useState(null);
-  const [pokeName, setPokeName] = useState('Mi Monstruosidad');
+  const [pokeName, setPokeName] = useState('Mi Criatura');
 
   // 5.2 Tipo 1 (18 tipos) y Tipo 2 (18 tipos + 'None')
   const [type1, setType1] = useState('Fire');
@@ -85,7 +85,7 @@ export default function CreatePokemon({ onBackToHub }) {
     setStats(predicted);
     setPredictedKeys(emptyBefore);
     setPredictionLog(
-      `El KNN (k=5) con doble fuerza para coincidencias exactas rellenó ${emptyBefore.size} stat(s) faltantes.`
+      `El cálculo automático con doble peso rellenó ${emptyBefore.size} estadística(s) faltantes.`
     );
     sfx.win();
   };
@@ -109,7 +109,7 @@ export default function CreatePokemon({ onBackToHub }) {
     sfx.click();
     setPipelineStep(1);
     setPokeImage(null);
-    setPokeName('Mi Monstruosidad');
+    setPokeName('Mi Criatura');
     setType1('Fire');
     setType2('None');
     setStats({ hp: '', attack: '', defense: '', spAtk: '', spDef: '', speed: '' });
@@ -150,7 +150,7 @@ export default function CreatePokemon({ onBackToHub }) {
 
         <div className="flex flex-wrap items-center gap-1.5 font-mono text-[11px] font-extrabold">
           {[
-            { s: 1, label: '5.1 JETA' },
+            { s: 1, label: '5.1 IMAGEN' },
             { s: 2, label: '5.2 TIPOS' },
             { s: 3, label: '5.3 STATS' },
             { s: 4, label: '5.4 CARTA' },
@@ -183,13 +183,13 @@ export default function CreatePokemon({ onBackToHub }) {
               <div className="space-y-5">
                 <div>
                   <span className="arcade-stamp bg-[#FFD43B] text-[#111827] font-mono text-[10px] font-extrabold px-2.5 py-0.5 rounded-md uppercase">
-                    PASO 5.1 • IMAGEN DEL ENGENDRO
+                    PASO 5.1 • IMAGEN DE TU POKÉMON
                   </span>
                   <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-[#111827] mt-2">
-                    Ponle Jeta y Nombre a tu Criatura
+                    Elige la Imagen y el Nombre de tu Criatura
                   </h2>
                   <p className="text-xs sm:text-sm font-semibold text-slate-700 mt-1">
-                    Ningún bicho entra al ring sin cara. Sube una imagen o róbate una plantilla abajo para empezar.
+                    Todo Pokémon necesita una apariencia. Sube una ilustración o usa una de las plantillas de abajo para comenzar.
                   </p>
                 </div>
 
@@ -391,13 +391,13 @@ export default function CreatePokemon({ onBackToHub }) {
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
                     <span className="arcade-stamp bg-[#FFD43B] text-[#111827] font-mono text-[10px] font-extrabold px-2.5 py-0.5 rounded-md uppercase">
-                      PASO 5.3 • STATS (1 A 200) + KNN k=5
+                      PASO 5.3 • STATS (1 A 200)
                     </span>
                     <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-[#111827] mt-2">
-                      Pon Números o Deja que el KNN Chambée
+                      Ingresa tus Valores o Calcula los Faltantes
                     </h2>
                     <p className="text-xs sm:text-sm font-semibold text-slate-700 mt-1">
-                      Solo enteros del <strong>1 al 200</strong> o vacíos. <strong>Predecir</strong> se activa solo si falta algún dato; <strong>Generar</strong> se desbloquea cuando los 6 estén completos.
+                      Solo números enteros del <strong>1 al 200</strong> o déjalos vacíos. <strong>Predecir</strong> se activa si falta algún dato; <strong>Generar</strong> se desbloquea al tener los 6 completos.
                     </p>
                   </div>
 
@@ -489,7 +489,7 @@ export default function CreatePokemon({ onBackToHub }) {
                         allStatsFilled ? 'bg-[#16A34A] text-white' : 'bg-slate-200 text-slate-500'
                       }`}
                     >
-                      Generar Monstruo →
+                      Generar Pokémon →
                     </button>
                   </div>
                 </div>
@@ -650,7 +650,7 @@ export default function CreatePokemon({ onBackToHub }) {
                 onClick={handleReset}
                 className="arcade-btn flex-1 bg-[#FFD43B] hover:bg-[#FFE066] text-[#111827] py-3.5 px-5 rounded-2xl font-display font-extrabold text-sm uppercase cursor-pointer"
               >
-                Forjar Otro Engendro
+                Crear Otro Pokémon
               </button>
               <button
                 onClick={() => {

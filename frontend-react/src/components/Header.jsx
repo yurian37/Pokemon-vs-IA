@@ -12,8 +12,8 @@ export default function Header({ currentScreen, onNavigate, onOpenLegal, selecte
     { id: 'stat-battle', num: '01', short: 'Stats', full: '¿Quién tiene más?' },
     { id: 'type-duel', num: '02', short: 'Alcánzame', full: '¿De qué tipo es?' },
     { id: 'type-betting', num: '03', short: 'Fichas', full: 'El tipo sí importa' },
-    { id: 'type-analysis', num: '04', short: 'Aura IA', full: 'Escáner de Aura' },
-    { id: 'create-pokemon', num: '05', short: 'Forja KNN', full: 'Crea tu Bicho' },
+    { id: 'type-analysis', num: '04', short: 'Analizador', full: 'Análisis de Tipo' },
+    { id: 'create-pokemon', num: '05', short: 'Creador', full: 'Crea a tu Pokémon' },
   ];
 
   const activeTheme = TYPE_COLORS[selectedBgType] || TYPE_COLORS.Fire;
