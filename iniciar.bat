@@ -1,7 +1,7 @@
 @echo off
-title Pokemon vs IA - Servidor de Desarrollo
+title PokeMind Games CR - Servidor de Desarrollo
 echo ==============================================
-echo    Iniciando Pokemon vs IA (Frontend React)
+echo    Iniciando PokeMind Games CR (Frontend React)
 echo ==============================================
 echo.
 

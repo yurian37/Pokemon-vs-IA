@@ -1,4 +1,4 @@
-# 🎮 Pokémon vs IA — Trivia & Machine Learning Platform
+# 🎮 PokeMind Games CR — Trivia & Machine Learning Platform
 
 Plataforma web interactiva donde el jugador compite y colabora exclusivamente contra **modelos de Machine Learning e Inteligencia Artificial**, aplicando los principios de trivia, visión computacional y modelos predictivos del proyecto final de módulo.
 
@@ -10,7 +10,7 @@ Repositorio oficial: [https://github.com/yurian37/Pokemon-vs-IA.git](https://git
 
 > **DESLINDE DE RESPONSABILIDAD DE MARCA (TRADEMARK & COPYRIGHT DISCLAIMER):**
 > 
-> - **Titularidad de la Marca:** El autor y desarrollador de este proyecto **NO es dueño ni posee derechos sobre la marca Pokémon**. **Pokémon**, los nombres de las especies de Pokémon, ilustraciones, logotipos, sprites, estadísticas y elementos asociados son marcas registradas y derechos de autor propiedad exclusiva de **Nintendo Co., Ltd.**, **Creatures Inc.** y **Game Freak Inc.** Todos los derechos pertenecen a sus respectivos creadores.
+> - **Titularidad de la Marca:** El autor y desarrollador de **PokeMind Games CR** declara que **NO es dueño ni posee derechos sobre la marca Pokémon**. **Pokémon**, los nombres de las especies de Pokémon, ilustraciones, logotipos, sprites, estadísticas y elementos asociados son marcas registradas y derechos de autor propiedad exclusiva de **Nintendo Co., Ltd.**, **Creatures Inc.** y **Game Freak Inc.** Todos los derechos pertenecen a sus respectivos creadores.
 > - **Uso Gratuito y Sin Fines de Lucro:** Esta aplicación web es **100% gratuita** y de código abierto. **No se cobra dinero por su uso**, no contiene suscripciones, muros de pago ni monetización de ningún tipo. Ha sido desarrollada estrictamente con propósitos académicos, educativos y de demostración técnica en Inteligencia Artificial y Machine Learning.
 > - **Uso Justo (Fair Use):** La información y recursos multimedia son utilizados de buena fe con fines de investigación científica y formativa bajo la doctrina de *Uso Legítimo* (*Fair Use*). Las imágenes se obtienen de la API comunitaria y pública de [PokéAPI](https://pokeapi.co/).
 > - Este software no está respaldado, patrocinado, afiliado ni asociado con Nintendo, Game Freak ni The Pokémon Company.
@@ -29,7 +29,7 @@ A diferencia de aproximaciones que únicamente consultan el número de la Pokéd
 
 ## 🌟 Concepto y Arquitectura: "El Núcleo con Actividades Alrededor"
 
-En **Pokémon vs IA** no hay equipos ni competencia entre usuarios: es una experiencia inmersiva del **jugador humano contra la IA**. El sitio cuenta con una interfaz central interactiva (**El Núcleo / Core Kernel**) rodeado orbitalmente por **5 actividades independientes**:
+En **PokeMind Games CR** no hay equipos ni competencia entre usuarios: es una experiencia inmersiva del **jugador humano contra la IA**. El sitio cuenta con una interfaz central interactiva (**El Núcleo / Core Kernel**) rodeado orbitalmente por **5 actividades independientes**:
 
 ```
                        [ 1. ¿Quién tiene más? ]

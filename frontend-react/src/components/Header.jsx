@@ -32,10 +32,10 @@ export default function Header({ currentScreen, onNavigate, onOpenLegal }) {
           <div>
             <div className="flex items-center gap-1.5">
               <span className="text-lg md:text-xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-amber-300 to-indigo-300">
-                POKÉMON
+                POKEMIND
               </span>
               <span className="text-xs font-black px-1.5 py-0.5 rounded bg-indigo-600/80 text-indigo-100 border border-indigo-400/40">
-                VS IA
+                GAMES CR
               </span>
             </div>
             <p className="text-[10px] text-slate-400 tracking-wide font-medium hidden sm:block">

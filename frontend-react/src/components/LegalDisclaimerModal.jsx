@@ -19,7 +19,7 @@ export default function LegalDisclaimerModal({ isOpen, onClose }) {
                 Aviso Legal & Deslinde de Responsabilidad
               </h3>
               <span className="text-xs text-indigo-400 font-bold uppercase tracking-wider">
-                Uso Educativo, Libre y Sin Fines de Lucro
+                PokeMind Games CR • Uso Educativo, Libre y Sin Fines de Lucro
               </span>
             </div>
           </div>
@@ -39,7 +39,7 @@ export default function LegalDisclaimerModal({ isOpen, onClose }) {
               <span>🛡️</span> Titularidad y Derechos de la Marca Pokémon
             </h4>
             <p>
-              El autor y desarrollador de este proyecto <strong>NO es dueño ni titular de la marca Pokémon</strong>, ni posee derechos de autor o marcas registradas sobre los personajes, nombres, diseños, ilustraciones, logotipos ni universo de Pokémon. 
+              El autor y desarrollador de <strong>PokeMind Games CR</strong> declara que <strong>NO es dueño ni titular de la marca Pokémon</strong>, ni posee derechos de autor o marcas registradas sobre los personajes, nombres, diseños, ilustraciones, logotipos ni universo de Pokémon. 
             </p>
             <p className="mt-1.5 text-slate-400">
               <strong>Pokémon</strong>, los nombres de los Pokémon, ilustraciones, estadísticas y elementos asociados son marcas comerciales y derechos de autor propiedad exclusiva de <strong>Nintendo Co., Ltd.</strong>, <strong>Creatures Inc.</strong> y <strong>Game Freak Inc.</strong> Todos los derechos reservados a sus respectivos creadores.

@@ -65,7 +65,7 @@ export default function App() {
           
           <div className="flex flex-col md:flex-row items-center justify-between gap-3 border-b border-slate-900/80 pb-4">
             <div className="flex items-center gap-2">
-              <span className="font-black text-slate-200">Pokémon vs IA</span>
+              <span className="font-black text-slate-200">PokeMind Games CR</span>
               <span>•</span>
               <span>Plataforma de Trivia & Machine Learning</span>
             </div>
@@ -82,7 +82,7 @@ export default function App() {
 
           <div className="text-[11px] text-slate-400 leading-relaxed text-center sm:text-left">
             <p>
-              <strong>Deslinde de Responsabilidad de Marca:</strong> Pokémon y los nombres de los personajes son marcas registradas y propiedad intelectual de <strong>Nintendo</strong>, <strong>Creatures Inc.</strong> y <strong>GAME FREAK inc.</strong> Este proyecto web es una iniciativa <strong>estrictamente académica, de código abierto, gratuita y sin fines de lucro</strong>. El autor no es dueño ni posee derechos sobre la marca Pokémon ni sus elementos multimedia; todo el contenido visual, estadístico y de nombres pertenece a sus respectivos dueños. No se cobra por el uso de este software en ninguna de sus formas.
+              <strong>Deslinde de Responsabilidad de Marca:</strong> Pokémon y los nombres de los personajes son marcas registradas y propiedad intelectual de <strong>Nintendo</strong>, <strong>Creatures Inc.</strong> y <strong>GAME FREAK inc.</strong> Este proyecto web (PokeMind Games CR) es una iniciativa <strong>estrictamente académica, de código abierto, gratuita y sin fines de lucro</strong>. El autor no es dueño ni posee derechos sobre la marca Pokémon ni sus elementos multimedia; todo el contenido visual, estadístico y de nombres pertenece a sus respectivos dueños. No se cobra por el uso de este software en ninguna de sus formas.
             </p>
           </div>
 

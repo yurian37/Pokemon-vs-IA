@@ -98,7 +98,7 @@ export default function CoreHub({ onNavigate, onOpenLegal }) {
             Arquitectura de 5 Módulos Activos
           </div>
           <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">
-            EL NÚCLEO <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-amber-300 to-indigo-400">POKÉMON VS IA</span>
+            EL NÚCLEO <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-amber-300 to-indigo-400">POKEMIND GAMES CR</span>
           </h2>
           <p className="text-sm md:text-base text-slate-300 mt-3 leading-relaxed">
             Aquí no hay equipos ni competencia entre personas: es únicamente el jugador enfrentándose a modelos de Machine Learning (Keras, KNN Logístico y Visión Computacional) impulsados por la PokéAPI oficial con soporte completo para formas base, regionales y megas.
