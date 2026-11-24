@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getTwoRandomPokemons, getRandomPokemon, getRandomStatKey, STAT_NAMES, TYPE_COLORS } from '../services/pokemonService';
+import TypeIcon from './TypeIcons';
 import confetti from 'canvas-confetti';
 
 export default function StatBattle({ onBackToHub }) {
@@ -90,51 +91,53 @@ export default function StatBattle({ onBackToHub }) {
   if (!pokemonLeft || !pokemonRight) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full" />
+        <div className="animate-spin w-12 h-12 border-4 border-amber-500 border-t-transparent rounded-full" />
       </div>
     );
   }
 
   const currentStat = STAT_NAMES[statKey];
+  const leftGradient = TYPE_COLORS[pokemonLeft.type1]?.bgGradientCss || 'linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%)';
+  const rightGradient = TYPE_COLORS[pokemonRight.type1]?.bgGradientCss || 'linear-gradient(135deg, #450a0a 0%, #0f172a 100%)';
 
   return (
     <div className="w-full max-w-5xl mx-auto flex flex-col items-center gap-6 py-4 px-4 animate-fadeIn">
       
       {/* BARRA SUPERIOR CON PUNTUACIÓN Y CONTROL */}
-      <div className="w-full flex flex-wrap items-center justify-between gap-4 bg-[#14192d] border border-slate-800 p-4 rounded-2xl shadow-xl">
+      <div className="w-full flex flex-wrap items-center justify-between gap-4 bg-[#101426] border border-amber-500/30 p-4 rounded-2xl shadow-xl backdrop-blur-md">
         <button
           onClick={onBackToHub}
-          className="text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-colors cursor-pointer"
+          className="text-xs font-black text-amber-300 hover:text-white flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-amber-500/30 hover:border-amber-400 transition-colors cursor-pointer"
         >
-          ← Volver al Núcleo
+          ← Regresar al Antro
         </button>
 
         <div className="flex items-center gap-3">
-          <span className="text-xs uppercase tracking-wider font-extrabold text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-xl border border-indigo-500/20">
-            Actividad 1 • ¿Quién tiene más?
+          <span className="text-xs uppercase tracking-wider font-extrabold text-amber-400 bg-amber-500/10 px-3 py-1 rounded-xl border border-amber-500/20">
+            Duelo Callejero • ¿Quién la tiene más grande?
           </span>
         </div>
 
         <div className="flex items-center gap-4 text-xs font-bold">
           <div className="bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl text-slate-300">
-            Récord: <span className="text-amber-400 font-black">{highScore}</span>
+            Mejor Racha: <span className="text-amber-400 font-black">{highScore}</span>
           </div>
-          <div className="bg-indigo-600/30 border border-indigo-500/40 px-3 py-1.5 rounded-xl text-white">
-            Puntos: <span className="text-emerald-400 font-black text-sm">{score}</span>
+          <div className="bg-amber-600/30 border border-amber-500/40 px-3 py-1.5 rounded-xl text-white">
+            Racha Actual: <span className="text-emerald-400 font-black text-sm">{score}</span>
           </div>
         </div>
       </div>
 
       {/* ANUNCIO DE LA ESTADÍSTICA ALEATORIA */}
       <div className="text-center my-1">
-        <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
-          Estadística en juego
+        <span className="text-[11px] font-black uppercase tracking-widest text-amber-400/80 bg-amber-950/60 px-3 py-0.5 rounded-full border border-amber-500/30">
+          Estadística en Disputa
         </span>
-        <h2 className="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-400 to-rose-400 mt-1">
-          {currentStat.name}
+        <h2 className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-400 to-rose-400 mt-2 tracking-tight">
+          {currentStat.name} ({currentStat.short})
         </h2>
-        <p className="text-xs text-slate-300 mt-1">
-          ¿Cuál de los dos Pokémon tiene un valor mayor en {currentStat.short}?
+        <p className="text-xs text-slate-300 mt-1 font-semibold">
+          No le des vueltas: ¿cuál de estos dos cabrones tiene más {currentStat.short}? Si fallas te vas a la calle.
         </p>
       </div>
 
@@ -142,108 +145,118 @@ export default function StatBattle({ onBackToHub }) {
       <div className={`w-full grid grid-cols-1 md:grid-cols-2 gap-6 relative transition-all duration-300 ${shiftAnimation ? 'opacity-50 scale-95' : 'opacity-100'}`}>
         
         {/* POKEMON IZQUIERDA (A) */}
-        <div className="bg-[#141b2e] border border-slate-800 hover:border-indigo-500/50 rounded-3xl p-6 flex flex-col items-center justify-between shadow-2xl relative overflow-hidden transition-all group">
-          <div className="absolute top-4 left-4 text-[10px] font-black text-slate-400 bg-slate-900/80 px-2.5 py-1 rounded-lg border border-slate-800">
+        <div 
+          className="border-2 border-slate-700/80 hover:border-amber-400/80 rounded-3xl p-6 flex flex-col items-center justify-between shadow-2xl relative overflow-hidden transition-all group"
+          style={{ background: leftGradient }}
+        >
+          <div className="absolute top-4 left-4 text-[10px] font-black text-amber-300 bg-slate-950/80 px-2.5 py-1 rounded-lg border border-amber-500/30">
             #{pokemonLeft.id.toString().padStart(3, '0')}
           </div>
 
           <div className="w-full flex justify-end gap-1.5 mb-2">
             <span 
-              className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white shadow-sm"
+              className="text-[11px] font-black px-2.5 py-1 rounded-xl text-white shadow-md flex items-center gap-1.5 border border-white/20"
               style={{ backgroundColor: TYPE_COLORS[pokemonLeft.type1]?.bg || '#777' }}
             >
+              <TypeIcon type={pokemonLeft.type1} className="w-3.5 h-3.5 fill-current" />
               {pokemonLeft.type1}
             </span>
             {pokemonLeft.type2 && (
               <span 
-                className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white shadow-sm"
+                className="text-[11px] font-black px-2.5 py-1 rounded-xl text-white shadow-md flex items-center gap-1.5 border border-white/20"
                 style={{ backgroundColor: TYPE_COLORS[pokemonLeft.type2]?.bg || '#777' }}
               >
+                <TypeIcon type={pokemonLeft.type2} className="w-3.5 h-3.5 fill-current" />
                 {pokemonLeft.type2}
               </span>
             )}
           </div>
 
           {/* Imagen de PokéAPI */}
-          <div className="relative w-48 h-48 flex items-center justify-center my-3">
+          <div className="relative w-48 h-48 flex items-center justify-center my-3 bg-black/20 rounded-2xl backdrop-blur-xs p-2">
             <img 
               src={pokemonLeft.image} 
               alt={pokemonLeft.name}
               onError={(e) => { e.target.src = pokemonLeft.thumbnail; }}
-              className="max-w-full max-h-full object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] group-hover:scale-105 transition-transform"
+              className="max-w-full max-h-full object-contain filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.8)] group-hover:scale-105 transition-transform"
             />
           </div>
 
-          <h3 className="text-xl font-black text-white mb-2">{pokemonLeft.name}</h3>
+          <h3 className="text-2xl font-black text-white mb-3 tracking-wide drop-shadow">{pokemonLeft.name}</h3>
 
           {/* REVELACIÓN DE STAT */}
           {gameState !== 'playing' ? (
-            <div className="w-full py-3 px-4 rounded-2xl bg-slate-900 border border-slate-700 text-center animate-bounce">
-              <span className="text-xs text-slate-400 font-bold uppercase">{currentStat.short}:</span>
+            <div className="w-full py-3 px-4 rounded-2xl bg-slate-950/90 border border-amber-400 text-center animate-bounce shadow-xl">
+              <span className="text-xs text-slate-300 font-bold uppercase">{currentStat.short}:</span>
               <span className="text-3xl font-black text-amber-400 ml-2">{pokemonLeft[statKey]}</span>
             </div>
           ) : (
             <button
               onClick={() => handleGuess('left')}
-              className="w-full py-3.5 px-6 rounded-2xl font-black text-sm uppercase tracking-wider text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 shadow-lg shadow-indigo-500/25 active:scale-95 transition-all cursor-pointer"
+              className="w-full py-4 px-6 rounded-2xl font-black text-sm uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 to-yellow-300 hover:from-amber-300 hover:to-yellow-200 shadow-lg shadow-amber-500/30 active:scale-95 transition-all cursor-pointer border border-yellow-200"
             >
-              {pokemonLeft.name} tiene más
+              🔥 ¡{pokemonLeft.name} la tiene más grande!
             </button>
           )}
         </div>
 
         {/* VS BADGE CENTRAL */}
-        <div className="hidden md:flex absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-[#0d1222] border-2 border-indigo-400/80 items-center justify-center font-black text-sm text-indigo-300 shadow-2xl">
+        <div className="hidden md:flex absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full bg-slate-950 border-2 border-amber-400 items-center justify-center font-black text-sm text-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.5)]">
           VS
         </div>
 
         {/* POKEMON DERECHA (B) */}
-        <div className="bg-[#141b2e] border border-slate-800 hover:border-amber-500/50 rounded-3xl p-6 flex flex-col items-center justify-between shadow-2xl relative overflow-hidden transition-all group">
-          <div className="absolute top-4 left-4 text-[10px] font-black text-slate-400 bg-slate-900/80 px-2.5 py-1 rounded-lg border border-slate-800">
+        <div 
+          className="border-2 border-slate-700/80 hover:border-amber-400/80 rounded-3xl p-6 flex flex-col items-center justify-between shadow-2xl relative overflow-hidden transition-all group"
+          style={{ background: rightGradient }}
+        >
+          <div className="absolute top-4 left-4 text-[10px] font-black text-amber-300 bg-slate-950/80 px-2.5 py-1 rounded-lg border border-amber-500/30">
             #{pokemonRight.id.toString().padStart(3, '0')}
           </div>
 
           <div className="w-full flex justify-end gap-1.5 mb-2">
             <span 
-              className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white shadow-sm"
+              className="text-[11px] font-black px-2.5 py-1 rounded-xl text-white shadow-md flex items-center gap-1.5 border border-white/20"
               style={{ backgroundColor: TYPE_COLORS[pokemonRight.type1]?.bg || '#777' }}
             >
+              <TypeIcon type={pokemonRight.type1} className="w-3.5 h-3.5 fill-current" />
               {pokemonRight.type1}
             </span>
             {pokemonRight.type2 && (
               <span 
-                className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white shadow-sm"
+                className="text-[11px] font-black px-2.5 py-1 rounded-xl text-white shadow-md flex items-center gap-1.5 border border-white/20"
                 style={{ backgroundColor: TYPE_COLORS[pokemonRight.type2]?.bg || '#777' }}
               >
+                <TypeIcon type={pokemonRight.type2} className="w-3.5 h-3.5 fill-current" />
                 {pokemonRight.type2}
               </span>
             )}
           </div>
 
           {/* Imagen de PokéAPI */}
-          <div className="relative w-48 h-48 flex items-center justify-center my-3">
+          <div className="relative w-48 h-48 flex items-center justify-center my-3 bg-black/20 rounded-2xl backdrop-blur-xs p-2">
             <img 
               src={pokemonRight.image} 
               alt={pokemonRight.name}
               onError={(e) => { e.target.src = pokemonRight.thumbnail; }}
-              className="max-w-full max-h-full object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] group-hover:scale-105 transition-transform"
+              className="max-w-full max-h-full object-contain filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.8)] group-hover:scale-105 transition-transform"
             />
           </div>
 
-          <h3 className="text-xl font-black text-white mb-2">{pokemonRight.name}</h3>
+          <h3 className="text-2xl font-black text-white mb-3 tracking-wide drop-shadow">{pokemonRight.name}</h3>
 
           {/* REVELACIÓN DE STAT */}
           {gameState !== 'playing' ? (
-            <div className="w-full py-3 px-4 rounded-2xl bg-slate-900 border border-slate-700 text-center animate-bounce">
-              <span className="text-xs text-slate-400 font-bold uppercase">{currentStat.short}:</span>
+            <div className="w-full py-3 px-4 rounded-2xl bg-slate-950/90 border border-amber-400 text-center animate-bounce shadow-xl">
+              <span className="text-xs text-slate-300 font-bold uppercase">{currentStat.short}:</span>
               <span className="text-3xl font-black text-amber-400 ml-2">{pokemonRight[statKey]}</span>
             </div>
           ) : (
             <button
               onClick={() => handleGuess('right')}
-              className="w-full py-3.5 px-6 rounded-2xl font-black text-sm uppercase tracking-wider text-white bg-gradient-to-r from-amber-600 to-rose-600 hover:from-amber-500 hover:to-rose-500 shadow-lg shadow-amber-500/25 active:scale-95 transition-all cursor-pointer"
+              className="w-full py-4 px-6 rounded-2xl font-black text-sm uppercase tracking-wider text-slate-950 bg-gradient-to-r from-orange-400 to-amber-300 hover:from-orange-300 hover:to-amber-200 shadow-lg shadow-orange-500/30 active:scale-95 transition-all cursor-pointer border border-amber-200"
             >
-              {pokemonRight.name} tiene más
+              ⚡ ¡{pokemonRight.name} la tiene más grande!
             </button>
           )}
         </div>
@@ -252,36 +265,36 @@ export default function StatBattle({ onBackToHub }) {
 
       {/* FEEDBACK DE RESPUESTA EN VIVO */}
       {lastComparison && gameState === 'revealed' && (
-        <div className={`p-4 rounded-2xl border text-center max-w-md w-full animate-fadeIn ${
-          lastComparison.isCorrect ? 'bg-emerald-950/80 border-emerald-500/40 text-emerald-300' : 'bg-rose-950/80 border-rose-500/40 text-rose-300'
+        <div className={`p-4 rounded-2xl border-2 text-center max-w-md w-full animate-fadeIn shadow-xl ${
+          lastComparison.isCorrect ? 'bg-emerald-950/90 border-emerald-400 text-emerald-300' : 'bg-rose-950/90 border-rose-500 text-rose-300'
         }`}>
           <span className="font-black text-base block mb-0.5">
-            {lastComparison.isCorrect ? '✅ ¡ACIERTO! +1 Punto' : '❌ ¡INCORRECTO!'}
+            {lastComparison.isCorrect ? '🎯 ¡Toma ya! Le diste al clavo (+1 Racha)' : '💀 ¡Cagaste! Esa no era ni de coña'}
           </span>
-          <span className="text-xs">
-            {pokemonLeft.name} ({lastComparison.valLeft}) vs {pokemonRight.name} ({lastComparison.valRight})
+          <span className="text-xs font-bold">
+            {pokemonLeft.name} [{lastComparison.valLeft}] vs {pokemonRight.name} [{lastComparison.valRight}]
           </span>
         </div>
       )}
 
       {/* MODAL GAME OVER */}
       {gameState === 'gameover' && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn">
-          <div className="bg-[#141b2e] border-2 border-rose-500/40 rounded-3xl p-8 max-w-md w-full text-center shadow-2xl">
-            <span className="text-5xl block mb-2">💥</span>
-            <h3 className="text-2xl font-black text-rose-400 uppercase tracking-tight">Game Over</h3>
-            <p className="text-xs text-slate-300 mt-1">
-              Has fallado la comparación de estadísticas.
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-[#121629] border-2 border-rose-500 rounded-3xl p-8 max-w-md w-full text-center shadow-[0_0_50px_rgba(244,63,94,0.3)]">
+            <span className="text-6xl block mb-2">💥</span>
+            <h3 className="text-3xl font-black text-rose-400 uppercase tracking-tight">¡Te fuiste a la mierda!</h3>
+            <p className="text-xs text-slate-300 mt-1 font-semibold">
+              Te confiaste y el algoritmo se está riendo en tu cara. ¿Vas a llorar o vas a pedir revancha?
             </p>
 
             <div className="my-6 p-4 rounded-2xl bg-slate-900 border border-slate-800 flex justify-around">
               <div>
-                <span className="text-[10px] text-slate-400 uppercase font-bold block">Puntos Conseguidos</span>
+                <span className="text-[10px] text-slate-400 uppercase font-bold block">Puntos Logrados</span>
                 <span className="text-3xl font-black text-white">{score}</span>
               </div>
               <div className="w-px bg-slate-800" />
               <div>
-                <span className="text-[10px] text-slate-400 uppercase font-bold block">Récord Actual</span>
+                <span className="text-[10px] text-slate-400 uppercase font-bold block">Récord Guardado</span>
                 <span className="text-3xl font-black text-amber-400">{highScore}</span>
               </div>
             </div>
@@ -289,15 +302,15 @@ export default function StatBattle({ onBackToHub }) {
             <div className="flex flex-col gap-3">
               <button
                 onClick={startNewGame}
-                className="w-full py-3.5 rounded-xl font-black text-sm uppercase text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-lg shadow-indigo-500/30 transition-all cursor-pointer"
+                className="w-full py-4 rounded-xl font-black text-sm uppercase text-slate-950 bg-gradient-to-r from-amber-400 to-yellow-300 hover:from-amber-300 hover:to-yellow-200 shadow-lg shadow-amber-500/30 transition-all cursor-pointer"
               >
-                Jugar de Nuevo
+                🔄 Otra ronda, no me voy perdiendo
               </button>
               <button
                 onClick={onBackToHub}
                 className="w-full py-2.5 rounded-xl font-bold text-xs text-slate-400 hover:text-white bg-slate-900 hover:bg-slate-800 transition-colors cursor-pointer"
               >
-                Volver al Núcleo
+                Volver con la cabeza gacha
               </button>
             </div>
           </div>

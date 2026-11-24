@@ -1,31 +1,178 @@
 import pokemonData from '../data/pokemonData.json';
 
-// Los 18 Tipos Oficiales de Pokémon con sus colores y gradientes
+// Los 18 Tipos Oficiales de Pokémon
 export const POKEMON_TYPES = [
   'Normal', 'Fire', 'Water', 'Grass', 'Electric', 'Ice',
   'Fighting', 'Poison', 'Ground', 'Flying', 'Psychic', 'Bug',
   'Rock', 'Ghost', 'Dragon', 'Steel', 'Dark', 'Fairy'
 ];
 
+/**
+ * 18 Fondos con degradación de colores espectacular, brillo neón y texturas para cada Tipo
+ */
 export const TYPE_COLORS = {
-  Normal: { bg: '#A8A77A', text: '#FFFFFF', gradient: 'from-[#A8A77A] to-[#8A885D]', border: '#8A885D' },
-  Fire: { bg: '#EE8130', text: '#FFFFFF', gradient: 'from-[#FF7A00] to-[#EE3800]', border: '#C03000' },
-  Water: { bg: '#6390F0', text: '#FFFFFF', gradient: 'from-[#3B82F6] to-[#1D4ED8]', border: '#1D4ED8' },
-  Grass: { bg: '#7AC74C', text: '#FFFFFF', gradient: 'from-[#22C55E] to-[#15803D]', border: '#15803D' },
-  Electric: { bg: '#F7D02C', text: '#1E293B', gradient: 'from-[#FACC15] to-[#EAB308]', border: '#CA8A04' },
-  Ice: { bg: '#96D9D6', text: '#1E293B', gradient: 'from-[#38BDF8] to-[#06B6D4]', border: '#0284C7' },
-  Fighting: { bg: '#C22E28', text: '#FFFFFF', gradient: 'from-[#DC2626] to-[#991B1B]', border: '#7F1D1D' },
-  Poison: { bg: '#A33EA1', text: '#FFFFFF', gradient: 'from-[#A855F7] to-[#7E22CE]', border: '#6B21A8' },
-  Ground: { bg: '#E2BF65', text: '#1E293B', gradient: 'from-[#D97706] to-[#B45309]', border: '#92400E' },
-  Flying: { bg: '#A98FF3', text: '#FFFFFF', gradient: 'from-[#818CF8] to-[#6366F1]', border: '#4F46E5' },
-  Psychic: { bg: '#F95587', text: '#FFFFFF', gradient: 'from-[#EC4899] to-[#BE185D]', border: '#9D174D' },
-  Bug: { bg: '#A6B91A', text: '#FFFFFF', gradient: 'from-[#84CC16] to-[#65A30D]', border: '#4D7C0F' },
-  Rock: { bg: '#B6A136', text: '#FFFFFF', gradient: 'from-[#CA8A04] to-[#854D0E]', border: '#713F12' },
-  Ghost: { bg: '#735797', text: '#FFFFFF', gradient: 'from-[#7C3AED] to-[#4C1D95]', border: '#5B21B6' },
-  Dragon: { bg: '#6F35FC', text: '#FFFFFF', gradient: 'from-[#6366F1] to-[#4338CA]', border: '#3730A3' },
-  Steel: { bg: '#B7B7CE', text: '#1E293B', gradient: 'from-[#94A3B8] to-[#64748B]', border: '#475569' },
-  Dark: { bg: '#705746', text: '#FFFFFF', gradient: 'from-[#334155] to-[#0F172A]', border: '#1E293B' },
-  Fairy: { bg: '#D685AD', text: '#FFFFFF', gradient: 'from-[#F472B6] to-[#DB2777]', border: '#BE185D' }
+  Normal: { 
+    bg: '#A8A77A', 
+    text: '#FFFFFF', 
+    gradient: 'from-[#A8A77A] via-[#8A885D] to-[#44403C]', 
+    bgGradientCss: 'radial-gradient(circle at 50% 20%, #C6C59E 0%, #8A885D 50%, #292524 100%)',
+    border: '#A8A77A',
+    glow: 'rgba(168, 167, 122, 0.45)',
+    tagBg: '#57534E'
+  },
+  Fire: { 
+    bg: '#EE8130', 
+    text: '#FFFFFF', 
+    gradient: 'from-[#FF7A00] via-[#EF4444] to-[#7F1D1D]', 
+    bgGradientCss: 'radial-gradient(circle at 50% 20%, #F97316 0%, #DC2626 50%, #450A0A 100%)',
+    border: '#F97316',
+    glow: 'rgba(239, 68, 68, 0.55)',
+    tagBg: '#991B1B'
+  },
+  Water: { 
+    bg: '#6390F0', 
+    text: '#FFFFFF', 
+    gradient: 'from-[#38BDF8] via-[#2563EB] to-[#0F172A]', 
+    bgGradientCss: 'radial-gradient(circle at 50% 20%, #38BDF8 0%, #1D4ED8 55%, #0B1329 100%)',
+    border: '#38BDF8',
+    glow: 'rgba(56, 189, 248, 0.5)',
+    tagBg: '#1E40AF'
+  },
+  Grass: { 
+    bg: '#7AC74C', 
+    text: '#FFFFFF', 
+    gradient: 'from-[#4ADE80] via-[#16A34A] to-[#052E16]', 
+    bgGradientCss: 'radial-gradient(circle at 50% 20%, #4ADE80 0%, #15803D 55%, #022C22 100%)',
+    border: '#4ADE80',
+    glow: 'rgba(74, 222, 128, 0.5)',
+    tagBg: '#166534'
+  },
+  Electric: { 
+    bg: '#F7D02C', 
+    text: '#1E293B', 
+    gradient: 'from-[#FDE047] via-[#EAB308] to-[#713F12]', 
+    bgGradientCss: 'radial-gradient(circle at 50% 20%, #FEF08A 0%, #CA8A04 55%, #422006 100%)',
+    border: '#FACC15',
+    glow: 'rgba(250, 204, 21, 0.6)',
+    tagBg: '#854D0E'
+  },
+  Ice: { 
+    bg: '#96D9D6', 
+    text: '#1E293B', 
+    gradient: 'from-[#BAE6FD] via-[#38BDF8] to-[#0C4A6E]', 
+    bgGradientCss: 'radial-gradient(circle at 50% 20%, #E0F2FE 0%, #0284C7 55%, #082F49 100%)',
+    border: '#7DD3FC',
+    glow: 'rgba(125, 211, 252, 0.55)',
+    tagBg: '#0369A1'
+  },
+  Fighting: { 
+    bg: '#C22E28', 
+    text: '#FFFFFF', 
+    gradient: 'from-[#F87171] via-[#DC2626] to-[#450A0A]', 
+    bgGradientCss: 'radial-gradient(circle at 50% 20%, #EF4444 0%, #991B1B 55%, #300606 100%)',
+    border: '#EF4444',
+    glow: 'rgba(220, 38, 38, 0.55)',
+    tagBg: '#7F1D1D'
+  },
+  Poison: { 
+    bg: '#A33EA1', 
+    text: '#FFFFFF', 
+    gradient: 'from-[#D8B4FE] via-[#9333EA] to-[#3B0764]', 
+    bgGradientCss: 'radial-gradient(circle at 50% 20%, #C084FC 0%, #7E22CE 55%, #240444 100%)',
+    border: '#C084FC',
+    glow: 'rgba(192, 132, 252, 0.55)',
+    tagBg: '#6B21A8'
+  },
+  Ground: { 
+    bg: '#E2BF65', 
+    text: '#1E293B', 
+    gradient: 'from-[#FDE68A] via-[#D97706] to-[#451A03]', 
+    bgGradientCss: 'radial-gradient(circle at 50% 20%, #FBBF24 0%, #B45309 55%, #291204 100%)',
+    border: '#FBBF24',
+    glow: 'rgba(245, 158, 11, 0.5)',
+    tagBg: '#78350F'
+  },
+  Flying: { 
+    bg: '#A98FF3', 
+    text: '#FFFFFF', 
+    gradient: 'from-[#C7D2FE] via-[#6366F1] to-[#1E1B4B]', 
+    bgGradientCss: 'radial-gradient(circle at 50% 20%, #A5B4FC 0%, #4F46E5 55%, #0F0E2A 100%)',
+    border: '#818CF8',
+    glow: 'rgba(129, 140, 248, 0.55)',
+    tagBg: '#3730A3'
+  },
+  Psychic: { 
+    bg: '#F95587', 
+    text: '#FFFFFF', 
+    gradient: 'from-[#F472B6] via-[#E11D48] to-[#4C0519]', 
+    bgGradientCss: 'radial-gradient(circle at 50% 20%, #FB7185 0%, #BE123C 55%, #30020D 100%)',
+    border: '#FB7185',
+    glow: 'rgba(251, 113, 133, 0.6)',
+    tagBg: '#9F1239'
+  },
+  Bug: { 
+    bg: '#A6B91A', 
+    text: '#FFFFFF', 
+    gradient: 'from-[#BEF264] via-[#65A30D] to-[#1A2E05]', 
+    bgGradientCss: 'radial-gradient(circle at 50% 20%, #A3E635 0%, #4D7C0F 55%, #142304 100%)',
+    border: '#A3E635',
+    glow: 'rgba(163, 230, 53, 0.5)',
+    tagBg: '#365314'
+  },
+  Rock: { 
+    bg: '#B6A136', 
+    text: '#FFFFFF', 
+    gradient: 'from-[#FCD34D] via-[#92400E] to-[#291804]', 
+    bgGradientCss: 'radial-gradient(circle at 50% 20%, #D97706 0%, #78350F 55%, #180D02 100%)',
+    border: '#D97706',
+    glow: 'rgba(217, 119, 6, 0.5)',
+    tagBg: '#592908'
+  },
+  Ghost: { 
+    bg: '#735797', 
+    text: '#FFFFFF', 
+    gradient: 'from-[#C084FC] via-[#6B21A8] to-[#170326]', 
+    bgGradientCss: 'radial-gradient(circle at 50% 20%, #9333EA 0%, #581C87 55%, #0F0118 100%)',
+    border: '#A855F7',
+    glow: 'rgba(168, 85, 247, 0.6)',
+    tagBg: '#4A154B'
+  },
+  Dragon: { 
+    bg: '#6F35FC', 
+    text: '#FFFFFF', 
+    gradient: 'from-[#A5B4FC] via-[#4F46E5] to-[#110D38]', 
+    bgGradientCss: 'radial-gradient(circle at 50% 20%, #6366F1 0%, #3730A3 55%, #08051E 100%)',
+    border: '#818CF8',
+    glow: 'rgba(99, 102, 241, 0.6)',
+    tagBg: '#2E2880'
+  },
+  Steel: { 
+    bg: '#B7B7CE', 
+    text: '#1E293B', 
+    gradient: 'from-[#F1F5F9] via-[#64748B] to-[#0F172A]', 
+    bgGradientCss: 'radial-gradient(circle at 50% 20%, #CBD5E1 0%, #475569 55%, #0B111E 100%)',
+    border: '#94A3B8',
+    glow: 'rgba(148, 163, 184, 0.45)',
+    tagBg: '#334155'
+  },
+  Dark: { 
+    bg: '#705746', 
+    text: '#FFFFFF', 
+    gradient: 'from-[#64748B] via-[#1E293B] to-[#020617]', 
+    bgGradientCss: 'radial-gradient(circle at 50% 20%, #334155 0%, #0F172A 55%, #000000 100%)',
+    border: '#475569',
+    glow: 'rgba(71, 85, 105, 0.5)',
+    tagBg: '#1E293B'
+  },
+  Fairy: { 
+    bg: '#D685AD', 
+    text: '#FFFFFF', 
+    gradient: 'from-[#FCE7F3] via-[#EC4899] to-[#500724]', 
+    bgGradientCss: 'radial-gradient(circle at 50% 20%, #F472B6 0%, #BE185D 55%, #2E0314 100%)',
+    border: '#F472B6',
+    glow: 'rgba(244, 114, 182, 0.6)',
+    tagBg: '#9D174D'
+  }
 };
 
 export const STAT_NAMES = {
@@ -39,71 +186,39 @@ export const STAT_NAMES = {
 
 export const STAT_KEYS = ['hp', 'attack', 'defense', 'spAtk', 'spDef', 'speed'];
 
-/**
- * Retorna todos los Pokémon del dataset.
- */
 export function getAllPokemons() {
   return pokemonData;
 }
 
-/**
- * Obtiene un Pokémon aleatorio.
- */
 export function getRandomPokemon(excludeId = null) {
   const filtered = excludeId ? pokemonData.filter(p => p.id !== excludeId) : pokemonData;
   const index = Math.floor(Math.random() * filtered.length);
   return filtered[index];
 }
 
-/**
- * Obtiene dos Pokémon distintos al azar.
- */
 export function getTwoRandomPokemons() {
   const p1 = getRandomPokemon();
   let p2 = getRandomPokemon(p1.id);
   return [p1, p2];
 }
 
-/**
- * Elige una estadística al azar de las 6.
- */
 export function getRandomStatKey() {
   const index = Math.floor(Math.random() * STAT_KEYS.length);
   return STAT_KEYS[index];
 }
 
-/**
- * Genera una ronda para la Actividad 2: "¿De qué tipo es?"
- * Reglas:
- * - 1 Pokémon al azar.
- * - 4 opciones de tipos: 1 correcta y 3 incorrectas.
- * - Para Pokémon de 2 tipos: la respuesta correcta contiene SOLO UNO de los dos tipos.
- * - Las 3 incorrectas NO deben contener NINGUNO de los 2 tipos del Pokémon.
- * - No incluye tipo 'null'.
- */
 export function generateTypeDuelRound() {
   const pokemon = getRandomPokemon();
-  
-  // Tipos del Pokémon
   const pokeTypes = [pokemon.type1];
   if (pokemon.type2 && pokemon.type2.toLowerCase() !== 'none') {
     pokeTypes.push(pokemon.type2);
   }
 
-  // Escoger un tipo correcto de los tipos que tiene
   const correctType = pokeTypes[Math.floor(Math.random() * pokeTypes.length)];
-
-  // Tipos prohibidos en distractores = todos los tipos del pokemon
   const forbiddenTypes = new Set(pokeTypes);
-
-  // Distractores válidos: de los 18 tipos, aquellos que no estén en forbiddenTypes
   const validDistractors = POKEMON_TYPES.filter(t => !forbiddenTypes.has(t));
-
-  // Seleccionar 3 distractores al azar
   const shuffledDistractors = [...validDistractors].sort(() => Math.random() - 0.5);
   const selectedDistractors = shuffledDistractors.slice(0, 3);
-
-  // Mezclar las 4 opciones
   const options = [correctType, ...selectedDistractors].sort(() => Math.random() - 0.5);
 
   return {
@@ -114,30 +229,12 @@ export function generateTypeDuelRound() {
   };
 }
 
-/**
- * Genera una ronda para la Actividad 3: "El tipo sí importa"
- * Reglas:
- * - Se escoge 1 de los 18 tipos (tipo null no existe).
- * - Se colocan 3 Pokémon con nombre e imagen:
- *   - 1 Pokémon que al menos uno de sus tipos es ese.
- *   - 2 Pokémon que NO poseen ese tipo para nada.
- */
 export function generateTypeBettingRound() {
-  // 1. Escoger un tipo al azar de los 18
   const targetType = POKEMON_TYPES[Math.floor(Math.random() * POKEMON_TYPES.length)];
-
-  // 2. Filtrar Pokémon que SÍ tienen ese tipo
-  const matches = pokemonData.filter(p => 
-    p.type1 === targetType || p.type2 === targetType
-  );
+  const matches = pokemonData.filter(p => p.type1 === targetType || p.type2 === targetType);
   const correctPokemon = matches[Math.floor(Math.random() * matches.length)];
 
-  // 3. Filtrar Pokémon que NO tienen ese tipo en absoluto
-  const nonMatches = pokemonData.filter(p => 
-    p.type1 !== targetType && p.type2 !== targetType
-  );
-  
-  // Seleccionar 2 Pokémon incorrectos al azar que sean distintos
+  const nonMatches = pokemonData.filter(p => p.type1 !== targetType && p.type2 !== targetType);
   const shuffledNonMatches = [...nonMatches].sort(() => Math.random() - 0.5);
   const incorrect1 = shuffledNonMatches[0];
   let incorrect2 = shuffledNonMatches[1];
@@ -145,7 +242,6 @@ export function generateTypeBettingRound() {
     incorrect2 = shuffledNonMatches[2];
   }
 
-  // Barajar las 3 opciones
   const options = [
     { ...correctPokemon, isCorrect: true },
     { ...incorrect1, isCorrect: false },

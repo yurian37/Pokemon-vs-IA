@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { analyzeImageAura } from '../services/mlModelsService';
 import { TYPE_COLORS } from '../services/pokemonService';
+import TypeIcon from './TypeIcons';
 
 export default function TypeAnalysis({ onBackToHub }) {
   const [imageSrc, setImageSrc] = useState(null);
@@ -22,7 +23,7 @@ export default function TypeAnalysis({ onBackToHub }) {
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      setErrorMsg('Por favor selecciona un archivo de imagen válido (PNG, JPG, WebP).');
+      setErrorMsg('Por favor mete un archivo de imagen decente (PNG, JPG, WebP).');
       return;
     }
 
@@ -43,63 +44,65 @@ export default function TypeAnalysis({ onBackToHub }) {
       const data = await analyzeImageAura(src);
       setResults(data);
     } catch (err) {
-      setErrorMsg('Error al procesar la imagen con el modelo: ' + err.message);
+      setErrorMsg('Petó el modelo al escanear la imagen: ' + err.message);
     } finally {
       setIsAnalyzing(false);
     }
   };
 
+  const dominantGradient = results?.dominantType ? TYPE_COLORS[results.dominantType]?.bgGradientCss : 'linear-gradient(135deg, #0e7490 0%, #082f49 100%)';
+
   return (
     <div className="w-full max-w-5xl mx-auto flex flex-col items-center gap-6 py-4 px-4 animate-fadeIn">
       
       {/* BARRA SUPERIOR */}
-      <div className="w-full flex flex-wrap items-center justify-between gap-4 bg-[#14192d] border border-slate-800 p-4 rounded-2xl shadow-xl">
+      <div className="w-full flex flex-wrap items-center justify-between gap-4 bg-[#101426] border border-cyan-500/30 p-4 rounded-2xl shadow-xl backdrop-blur-md">
         <button
           onClick={onBackToHub}
-          className="text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-colors cursor-pointer"
+          className="text-xs font-black text-cyan-300 hover:text-white flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-cyan-500/30 hover:border-cyan-400 transition-colors cursor-pointer"
         >
-          ← Volver al Núcleo
+          ← Regresar al Antro
         </button>
 
         <span className="text-xs uppercase tracking-wider font-extrabold text-cyan-400 bg-cyan-500/10 px-3 py-1 rounded-xl border border-cyan-500/20">
-          Actividad 4 • Análisis de Tipos Pokémon
+          Laboratorio Óptico • Escáner de Aura
         </span>
 
         {/* SELECTOR DE VISTA: BARRAS HORIZONTALES O CIRCULAR */}
-        <div className="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs">
+        <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
           <button
             onClick={() => setViewType('horizontal')}
-            className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer ${
+            className={`px-3 py-1.5 rounded-lg font-black transition-all cursor-pointer ${
               viewType === 'horizontal'
-                ? 'bg-cyan-500 text-slate-950 shadow-md font-black'
+                ? 'bg-cyan-400 text-slate-950 shadow-md font-black'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            📊 Barras Horizontal
+            📊 Barras al Grano (Top 5)
           </button>
           <button
             onClick={() => setViewType('circular')}
-            className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer ${
+            className={`px-3 py-1.5 rounded-lg font-black transition-all cursor-pointer ${
               viewType === 'circular'
-                ? 'bg-cyan-500 text-slate-950 shadow-md font-black'
+                ? 'bg-cyan-400 text-slate-950 shadow-md font-black'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            🍩 Circular (Top 5 + Otros)
+            🍩 Dona Completa (+Otros)
           </button>
         </div>
       </div>
 
       {/* ENUNCIADO */}
       <div className="text-center my-1 max-w-2xl">
-        <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
-          Escáner Convolucional & Visión Cromática
+        <span className="text-[11px] font-black uppercase tracking-widest text-cyan-400/80 bg-cyan-950/60 px-3 py-0.5 rounded-full border border-cyan-500/30">
+          Escáner de Esencia & Redes Neuronales
         </span>
-        <h2 className="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-teal-300 to-indigo-300 mt-1">
-          Análisis de Afinidad Elemental
+        <h2 className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-teal-300 to-indigo-300 mt-2 tracking-tight">
+          ¿A qué puto tipo huele este engendro?
         </h2>
-        <p className="text-xs text-slate-300 mt-1">
-          Sube la imagen de cualquier Pokémon o criatura. El modelo de IA evaluará la distribución de sus rasgos visuales y calculará el <strong>Top 5 de pertenencia a un tipo</strong>.
+        <p className="text-xs text-slate-300 mt-1 font-semibold">
+          Sube la jeta de cualquier Pokémon o criatura extraña. El modelo de IA desarmará sus frecuencias visuales y te escupirá sin rodeos el <strong>Top 5 de afinidad elemental</strong>.
         </p>
       </div>
 
@@ -107,9 +110,9 @@ export default function TypeAnalysis({ onBackToHub }) {
       <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
         
         {/* PANEL IZQUIERDO: UPLOAD Y PREVIEW */}
-        <div className="md:col-span-5 bg-[#141b2e] border border-slate-800 rounded-3xl p-6 flex flex-col items-center justify-between shadow-xl">
+        <div className="md:col-span-5 bg-[#121629] border-2 border-slate-700 rounded-3xl p-6 flex flex-col items-center justify-between shadow-xl">
           
-          <label className="w-full border-2 border-dashed border-slate-700 hover:border-cyan-500/60 rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer bg-slate-900/60 hover:bg-slate-900 transition-all group relative overflow-hidden">
+          <label className="w-full border-2 border-dashed border-slate-700 hover:border-cyan-400 rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer bg-slate-950/60 hover:bg-slate-950 transition-all group relative overflow-hidden">
             <input 
               type="file" 
               accept="image/*" 
@@ -122,37 +125,37 @@ export default function TypeAnalysis({ onBackToHub }) {
                 <img 
                   src={imageSrc} 
                   alt="Imagen a analizar" 
-                  className="max-w-full max-h-full object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]"
+                  className="max-w-full max-h-full object-contain filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.8)]"
                 />
               </div>
             ) : (
               <div className="flex flex-col items-center text-center py-6">
-                <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-2xl mb-3 group-hover:scale-110 transition-transform">
-                  📁
+                <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-3xl mb-3 group-hover:scale-110 transition-transform">
+                  👁️
                 </div>
                 <span className="text-xs font-black text-white uppercase tracking-wider mb-1">
-                  Carga tu Imagen
+                  Arroja la Imagen Aquí
                 </span>
-                <span className="text-[10px] text-slate-400 max-w-xs">
-                  Arrastra o haz clic para subir archivo (PNG, JPG, WebP)
+                <span className="text-[10px] text-slate-400 max-w-xs font-medium">
+                  PNG, JPG o WebP de cualquier engendro
                 </span>
               </div>
             )}
           </label>
 
           {/* EJEMPLOS RÁPIDOS */}
-          <div className="w-full mt-4 pt-3 border-t border-slate-800/80">
+          <div className="w-full mt-4 pt-3 border-t border-slate-800">
             <span className="text-[10px] uppercase font-bold text-slate-400 block mb-2 text-center">
-              O prueba con estas muestras:
+              ¿No tienes fotos? Prueba con estos especímenes:
             </span>
             <div className="grid grid-cols-4 gap-2">
               {sampleImages.map(sample => (
                 <button
                   key={sample.name}
                   onClick={() => processImage(sample.url)}
-                  className="p-1 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/40 flex flex-col items-center gap-1 transition-all cursor-pointer"
+                  className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-cyan-400/50 flex flex-col items-center gap-1 transition-all cursor-pointer group"
                 >
-                  <img src={sample.url} alt={sample.name} className="w-9 h-9 object-contain" />
+                  <img src={sample.url} alt={sample.name} className="w-10 h-10 object-contain group-hover:scale-110 transition-transform" />
                   <span className="text-[9px] text-slate-300 font-bold truncate max-w-full">{sample.name}</span>
                 </button>
               ))}
@@ -160,29 +163,28 @@ export default function TypeAnalysis({ onBackToHub }) {
           </div>
 
           {errorMsg && (
-            <div className="mt-3 p-2.5 rounded-xl bg-rose-950/80 border border-rose-500/40 text-[11px] text-rose-300 text-center w-full">
-              {errorMsg}
+            <div className="w-full mt-3 p-3 rounded-xl bg-rose-950/80 border border-rose-500/40 text-rose-300 text-xs text-center font-bold">
+              ❌ {errorMsg}
             </div>
           )}
-
         </div>
 
-        {/* PANEL DERECHO: VISUALIZACIÓN DE RESULTADOS TOP 5 */}
-        <div className="md:col-span-7 bg-[#141b2e] border border-slate-800 rounded-3xl p-6 shadow-xl min-h-[380px] flex flex-col justify-center">
+        {/* PANEL DERECHO: RESULTADOS Y VISUALIZACIÓN */}
+        <div className="md:col-span-7 bg-[#121629] border-2 border-slate-700 rounded-3xl p-6 shadow-xl min-h-[420px] flex flex-col justify-center">
           
           {isAnalyzing && (
-            <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
-              <div className="animate-spin w-10 h-10 border-4 border-cyan-400 border-t-transparent rounded-full" />
-              <span className="text-xs font-bold text-cyan-300 animate-pulse">
-                Procesando canales y extrayendo resonancia con el modelo...
+            <div className="flex flex-col items-center justify-center py-16 gap-3">
+              <div className="animate-spin w-12 h-12 border-4 border-cyan-400 border-t-transparent rounded-full shadow-[0_0_20px_rgba(6,182,212,0.5)]" />
+              <span className="text-sm font-black text-cyan-300 uppercase tracking-wider animate-pulse">
+                La red neuronal está destripando los píxeles...
               </span>
             </div>
           )}
 
           {!isAnalyzing && !results && (
-            <div className="text-center py-16 text-slate-500">
-              <span className="text-4xl block mb-2">🔮</span>
-              <p className="text-xs">Carga o selecciona una imagen para ver la predicción del modelo de IA.</p>
+            <div className="text-center py-16 text-slate-400">
+              <span className="text-5xl block mb-2">🔮</span>
+              <p className="text-xs font-semibold">Tira una imagen arriba para que la máquina te diga qué cojones es.</p>
             </div>
           )}
 
@@ -190,32 +192,34 @@ export default function TypeAnalysis({ onBackToHub }) {
             <div className="space-y-6 animate-fadeIn">
               
               {/* CABECERA DE RESULTADOS */}
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-3" style={{ background: dominantGradient, padding: '16px', borderRadius: '16px' }}>
                 <div>
-                  <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider">
-                    Predicción Principal
+                  <span className="text-[10px] uppercase font-black text-white/80 tracking-wider">
+                    Diagnóstico Elemental Definitivo
                   </span>
-                  <h3 className="text-lg font-black text-white flex items-center gap-2">
-                    Alma de Tipo <span 
-                      className="px-2.5 py-0.5 rounded-lg text-white text-sm"
+                  <h3 className="text-xl font-black text-white flex items-center gap-2 mt-0.5">
+                    Es Tipo 
+                    <span 
+                      className="px-3 py-1 rounded-xl text-white text-base font-black flex items-center gap-1.5 border border-white/30 shadow-lg"
                       style={{ backgroundColor: TYPE_COLORS[results.dominantType]?.bg || '#06B6D4' }}
                     >
+                      <TypeIcon type={results.dominantType} className="w-5 h-5 fill-current" />
                       {results.dominantType}
                     </span>
                   </h3>
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] text-slate-400 uppercase font-bold block">Resonancia</span>
-                  <span className="text-xl font-black text-cyan-400">{results.top5[0].percentage}%</span>
+                  <span className="text-[10px] text-white/80 uppercase font-black block">Resonancia</span>
+                  <span className="text-2xl font-black text-white drop-shadow">{results.top5[0].percentage}%</span>
                 </div>
               </div>
 
               {/* VISTA 1: GRÁFICO DE BARRAS HORIZONTAL (SOLO EL TOP 5) */}
               {viewType === 'horizontal' && (
                 <div className="space-y-3.5">
-                  <div className="flex justify-between text-[11px] font-bold text-slate-400 mb-1">
-                    <span>TOP 5 TIPOS PREDICHOS</span>
-                    <span>AFINIDAD %</span>
+                  <div className="flex justify-between text-[11px] font-black text-slate-400 mb-1">
+                    <span>TOP 5 TIPOS DETECTADOS</span>
+                    <span>PROBABILIDAD %</span>
                   </div>
 
                   {results.top5.map((item, idx) => {
@@ -223,21 +227,20 @@ export default function TypeAnalysis({ onBackToHub }) {
                     return (
                       <div key={item.type} className="space-y-1">
                         <div className="flex items-center justify-between text-xs">
-                          <span className="flex items-center gap-2 font-bold text-white">
-                            <span className="w-4 text-[10px] text-slate-500 font-mono">#{idx + 1}</span>
-                            <span 
-                              className="w-2.5 h-2.5 rounded-full"
-                              style={{ backgroundColor: typeStyle.bg }}
-                            />
+                          <span className="flex items-center gap-2 font-black text-white">
+                            <span className="w-5 text-[11px] text-amber-400 font-mono">#{idx + 1}</span>
+                            <span className="w-4 h-4 flex items-center justify-center">
+                              <TypeIcon type={item.type} className="w-4 h-4" />
+                            </span>
                             <span>{item.type}</span>
                           </span>
-                          <span className="font-mono font-black text-slate-200">
+                          <span className="font-mono font-black text-amber-300">
                             {item.percentage}%
                           </span>
                         </div>
 
                         {/* Barra animada */}
-                        <div className="w-full h-3.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800/80 p-0.5">
+                        <div className="w-full h-4 bg-slate-950 rounded-full overflow-hidden border border-slate-800 p-0.5">
                           <div 
                             className="h-full rounded-full transition-all duration-700 shadow-sm"
                             style={{ 
@@ -259,7 +262,7 @@ export default function TypeAnalysis({ onBackToHub }) {
                   {/* SVG DONUT CHART */}
                   <div className="relative w-44 h-44 flex items-center justify-center">
                     <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                      {/* Circunferencia: 2 * PI * 40 ≈ 251.2 */}
+                      {/* Circunferencia: 2 * PI * 38 ≈ 238.76 */}
                       {(() => {
                         const radius = 38;
                         const circumference = 2 * Math.PI * radius;
@@ -301,17 +304,16 @@ export default function TypeAnalysis({ onBackToHub }) {
                   </div>
 
                   {/* LEYENDA DEL GRÁFICO CIRCULAR */}
-                  <div className="space-y-1.5 text-xs w-full sm:w-auto">
+                  <div className="space-y-2 text-xs w-full sm:w-auto">
                     {results.top5.map(t => (
                       <div key={t.type} className="flex items-center justify-between gap-4">
                         <span className="flex items-center gap-2">
-                          <span 
-                            className="w-3 h-3 rounded-full"
-                            style={{ backgroundColor: TYPE_COLORS[t.type]?.bg || '#38BDF8' }}
-                          />
-                          <span className="text-slate-300 font-bold">{t.type}</span>
+                          <span className="w-4 h-4 flex items-center justify-center">
+                            <TypeIcon type={t.type} className="w-4 h-4" />
+                          </span>
+                          <span className="text-slate-200 font-bold">{t.type}</span>
                         </span>
-                        <span className="font-mono font-bold text-white">{t.percentage}%</span>
+                        <span className="font-mono font-bold text-amber-300">{t.percentage}%</span>
                       </div>
                     ))}
                     

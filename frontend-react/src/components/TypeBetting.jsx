@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { generateTypeBettingRound, TYPE_COLORS } from '../services/pokemonService';
 import { aiPredictTypeBetting } from '../services/mlModelsService';
+import TypeIcon from './TypeIcons';
 import confetti from 'canvas-confetti';
 
 export default function TypeBetting({ onBackToHub }) {
@@ -127,7 +128,7 @@ export default function TypeBetting({ onBackToHub }) {
       correctIdx,
       aiPlacedCorrect,
       userPlacedCorrect,
-      multiplierText: aiPlacedCorrect === 0 ? 'x3 (Triplicado)' : aiPlacedCorrect === 2 ? 'x2 (Duplicado)' : 'x1.5 (Redondeo ↑)'
+      multiplierText: aiPlacedCorrect === 0 ? 'x3 (¡Triplicado en su cara!)' : aiPlacedCorrect === 2 ? 'x2 (Duplicado limpio)' : 'x1.5 (Redondeo ↑ con desprecio)'
     });
 
     // Verificar condición de fin:
@@ -150,27 +151,28 @@ export default function TypeBetting({ onBackToHub }) {
   if (!currentRoundData) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full" />
+        <div className="animate-spin w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full" />
       </div>
     );
   }
 
-  const targetStyle = TYPE_COLORS[currentRoundData.targetType] || { bg: '#4F46E5', text: '#fff' };
+  const targetStyle = TYPE_COLORS[currentRoundData.targetType] || { bg: '#10B981', text: '#fff' };
+  const targetGradient = targetStyle.bgGradientCss || 'linear-gradient(135deg, #064e3b 0%, #022c22 100%)';
 
   return (
     <div className="w-full max-w-5xl mx-auto flex flex-col items-center gap-6 py-4 px-4 animate-fadeIn">
       
       {/* BARRA SUPERIOR CON FICHAS Y RONDAS */}
-      <div className="w-full flex flex-wrap items-center justify-between gap-4 bg-[#14192d] border border-slate-800 p-4 rounded-2xl shadow-xl">
+      <div className="w-full flex flex-wrap items-center justify-between gap-4 bg-[#101426] border border-emerald-500/30 p-4 rounded-2xl shadow-xl backdrop-blur-md">
         <button
           onClick={onBackToHub}
-          className="text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-colors cursor-pointer"
+          className="text-xs font-black text-emerald-300 hover:text-white flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-emerald-500/30 hover:border-emerald-400 transition-colors cursor-pointer"
         >
-          ← Volver al Núcleo
+          ← Salir del Casino
         </button>
 
         <span className="text-xs uppercase tracking-wider font-extrabold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-xl border border-emerald-500/20">
-          Actividad 3 • El tipo sí importa
+          Casino Clandestino • El tipo sí importa
         </span>
 
         <div className="flex items-center gap-4 text-xs font-bold">
@@ -178,49 +180,49 @@ export default function TypeBetting({ onBackToHub }) {
             Ronda: <span className="text-white font-black">{round}</span> / {maxRounds}
           </div>
           <div className="bg-amber-500/20 border border-amber-500/40 px-3.5 py-1.5 rounded-xl text-amber-300 flex items-center gap-1.5">
-            <span>🪙</span> Tus Fichas: <span className="text-white font-black text-sm">{chips}</span>
+            <span>🪙</span> Fichas Vivas: <span className="text-amber-300 font-black text-sm">{chips}</span>
           </div>
         </div>
       </div>
 
       {/* ENUNCIADO DE LA MISIÓN CON EL TIPO OBJETIVO */}
       <div className="text-center my-1">
-        <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
-          Tipo Objetivo de la Ronda
+        <span className="text-[11px] font-black uppercase tracking-widest text-emerald-400/80 bg-emerald-950/60 px-3 py-0.5 rounded-full border border-emerald-500/30">
+          Tipo Objetivo a Buscar
         </span>
-        <div className="inline-flex items-center gap-2 mt-1">
-          <span 
-            className="text-2xl md:text-3xl font-black px-6 py-1.5 rounded-2xl text-white shadow-lg"
-            style={{ backgroundColor: targetStyle.bg }}
-          >
+        <div className="inline-flex items-center gap-3 mt-2 p-2 rounded-2xl border border-white/20 shadow-2xl" style={{ background: targetGradient }}>
+          <div className="w-10 h-10 rounded-xl bg-black/30 flex items-center justify-center p-1.5">
+            <TypeIcon type={currentRoundData.targetType} className="w-7 h-7" />
+          </div>
+          <span className="text-2xl md:text-3xl font-black px-4 py-1 text-white uppercase tracking-wider drop-shadow">
             Tipo {currentRoundData.targetType}
           </span>
         </div>
-        <p className="text-xs text-slate-300 mt-2 max-w-xl mx-auto">
-          Uno de los 3 Pokémon posee este tipo en su combinación elemental. Distribuye tus <strong>5 fichas</strong> por ronda para competir contra la IA.
+        <p className="text-xs text-slate-300 mt-2 max-w-xl mx-auto font-medium">
+          Sólo 1 de estos 3 bichos lleva la esencia del tipo <strong>{currentRoundData.targetType}</strong>. Los otros dos son pura farsa. Suelta tus <strong>5 fichas</strong> sabiamente o prepárate para quedar pelado.
         </p>
       </div>
 
       {/* PANEL DE APUESTA DE FICHAS RESTANTES */}
       {roundStatus === 'betting' && (
-        <div className="w-full bg-[#121829] border border-slate-800 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 text-xs">
+        <div className="w-full bg-[#121629] border-2 border-emerald-500/30 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 text-xs">
           <div className="flex items-center gap-2">
-            <span className="text-base">🪙</span>
-            <span className="text-slate-300 font-bold">
-              Fichas por colocar en esta ronda: <strong className={`text-sm font-black ${remainingToPlace === 0 ? 'text-emerald-400' : 'text-amber-400'}`}>{remainingToPlace} / 5</strong>
+            <span className="text-lg">🪙</span>
+            <span className="text-slate-200 font-bold">
+              Fichas listas para tirar en este asalto: <strong className={`text-base font-black ${remainingToPlace === 0 ? 'text-emerald-400' : 'text-amber-400'}`}>{remainingToPlace} / 5</strong>
             </span>
           </div>
 
           <button
             disabled={totalBet !== 5}
             onClick={handleConfirmBets}
-            className={`py-2 px-6 rounded-xl font-black text-xs uppercase tracking-wider transition-all cursor-pointer ${
+            className={`py-2.5 px-6 rounded-xl font-black text-xs uppercase tracking-wider transition-all cursor-pointer ${
               totalBet === 5
-                ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/25 hover:from-emerald-600 hover:to-teal-700 active:scale-95'
+                ? 'bg-gradient-to-r from-emerald-400 to-teal-400 text-slate-950 shadow-lg shadow-emerald-500/30 hover:from-emerald-300 hover:to-teal-300 active:scale-95 border border-emerald-200'
                 : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
             }`}
           >
-            {totalBet === 5 ? 'Confirmar Apuesta de 5 Fichas →' : `Coloca ${remainingToPlace} fichas más`}
+            {totalBet === 5 ? '🔥 ¡Soltar las 5 fichas y ver si la IA llora!' : `Faltan colocar ${remainingToPlace} fichas`}
           </button>
         </div>
       )}
@@ -232,55 +234,66 @@ export default function TypeBetting({ onBackToHub }) {
           const userBet = userBets[idx];
           const aiBet = aiBets[idx];
           const isRevealed = roundStatus !== 'betting';
+          const cardGradient = TYPE_COLORS[pokemon.type1]?.bgGradientCss || 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)';
 
-          let borderStyle = 'border-slate-800';
+          let borderStyle = 'border-slate-700 hover:border-emerald-400/60';
           if (isRevealed) {
-            borderStyle = isCorrect ? 'border-emerald-500 shadow-emerald-500/30' : 'border-rose-900/50 opacity-70';
+            borderStyle = isCorrect ? 'border-emerald-400 shadow-[0_0_25px_rgba(16,185,129,0.5)]' : 'border-rose-900/60 opacity-60';
           }
 
           return (
             <div
               key={pokemon.id}
-              className={`bg-[#141b2e] border-2 ${borderStyle} rounded-3xl p-5 flex flex-col justify-between shadow-xl relative transition-all`}
+              className={`border-2 ${borderStyle} rounded-3xl p-5 flex flex-col justify-between shadow-xl relative transition-all`}
+              style={{ background: isRevealed && isCorrect ? cardGradient : '#13182c' }}
             >
               {/* Insignia de acierto en revelación */}
               {isRevealed && (
-                <div className={`absolute top-3 right-3 text-[10px] font-black px-2.5 py-1 rounded-full text-white shadow-md ${
-                  isCorrect ? 'bg-emerald-600' : 'bg-slate-800 text-slate-400'
+                <div className={`absolute top-3 right-3 text-[10px] font-black px-2.5 py-1 rounded-full text-white shadow-md flex items-center gap-1 ${
+                  isCorrect ? 'bg-emerald-600 border border-emerald-300' : 'bg-slate-800 text-slate-400'
                 }`}>
-                  {isCorrect ? `✅ Es Tipo ${currentRoundData.targetType}` : '❌ No tiene ese tipo'}
+                  {isCorrect ? (
+                    <>
+                      <TypeIcon type={currentRoundData.targetType} className="w-3 h-3 fill-current" />
+                      <span>¡Es el bicho real!</span>
+                    </>
+                  ) : (
+                    <span>❌ Este no tiene ni pizca</span>
+                  )}
                 </div>
               )}
 
               {/* Imagen y Nombre */}
               <div className="flex flex-col items-center">
-                <span className="text-[10px] font-mono text-slate-500 mb-1">
+                <span className="text-[10px] font-mono text-slate-400 mb-1">
                   Opción {idx + 1} • #{pokemon.id.toString().padStart(3, '0')}
                 </span>
-                <div className="w-36 h-36 flex items-center justify-center my-2">
+                <div className="w-36 h-36 flex items-center justify-center my-2 bg-black/20 rounded-2xl p-2">
                   <img 
                     src={pokemon.image} 
                     alt={pokemon.name}
                     onError={(e) => { e.target.src = pokemon.thumbnail; }}
-                    className="max-w-full max-h-full object-contain filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.5)]"
+                    className="max-w-full max-h-full object-contain filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.8)]"
                   />
                 </div>
-                <h4 className="text-base font-black text-white text-center mt-1">{pokemon.name}</h4>
+                <h4 className="text-lg font-black text-white text-center mt-1">{pokemon.name}</h4>
 
                 {/* Tipos del Pokémon (revelados al final de ronda) */}
                 {isRevealed && (
-                  <div className="flex gap-1 mt-1.5">
+                  <div className="flex gap-1.5 mt-2">
                     <span 
-                      className="text-[9px] font-bold px-2 py-0.5 rounded text-white"
+                      className="text-[10px] font-black px-2 py-0.5 rounded-lg text-white flex items-center gap-1 shadow"
                       style={{ backgroundColor: TYPE_COLORS[pokemon.type1]?.bg || '#666' }}
                     >
+                      <TypeIcon type={pokemon.type1} className="w-3 h-3 fill-current" />
                       {pokemon.type1}
                     </span>
                     {pokemon.type2 && (
                       <span 
-                        className="text-[9px] font-bold px-2 py-0.5 rounded text-white"
+                        className="text-[10px] font-black px-2 py-0.5 rounded-lg text-white flex items-center gap-1 shadow"
                         style={{ backgroundColor: TYPE_COLORS[pokemon.type2]?.bg || '#666' }}
                       >
+                        <TypeIcon type={pokemon.type2} className="w-3 h-3 fill-current" />
                         {pokemon.type2}
                       </span>
                     )}
@@ -292,9 +305,9 @@ export default function TypeBetting({ onBackToHub }) {
               <div className="mt-4 pt-3 border-t border-slate-800 space-y-3">
                 {/* Fichas IA */}
                 {isRevealed && (
-                  <div className="bg-indigo-950/40 border border-indigo-500/20 p-2 rounded-xl flex items-center justify-between text-xs text-indigo-300">
-                    <span>🤖 Fichas IA:</span>
-                    <span className="font-black text-white bg-indigo-900/80 px-2 py-0.5 rounded">
+                  <div className="bg-purple-950/60 border border-purple-500/30 p-2 rounded-xl flex items-center justify-between text-xs text-purple-200">
+                    <span>🤖 Fichas de la IA:</span>
+                    <span className="font-black text-white bg-purple-900/80 px-2 py-0.5 rounded">
                       {aiBet} fichas
                     </span>
                   </div>
@@ -302,7 +315,7 @@ export default function TypeBetting({ onBackToHub }) {
 
                 {/* Fichas Usuario */}
                 <div className="bg-slate-900/90 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
-                  <span className="text-xs text-slate-400 font-bold">Tus Fichas:</span>
+                  <span className="text-xs text-slate-300 font-bold">Tu Apuesta:</span>
                   <span className="text-base font-black text-amber-400">
                     🪙 {userBet}
                   </span>
@@ -321,15 +334,15 @@ export default function TypeBetting({ onBackToHub }) {
                     <button
                       onClick={() => handleAddBet(idx, 1)}
                       disabled={remainingToPlace <= 0}
-                      className="flex-1 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                      className="flex-1 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                     >
                       +1
                     </button>
                     <button
                       onClick={() => handlePlaceAllOn(idx)}
-                      className="py-1.5 px-2 rounded-lg bg-amber-600/80 hover:bg-amber-500 text-white font-black text-[10px] uppercase cursor-pointer"
+                      className="py-1.5 px-3 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[10px] uppercase cursor-pointer"
                     >
-                      All 5
+                      ALL-IN
                     </button>
                   </div>
                 )}
@@ -342,21 +355,21 @@ export default function TypeBetting({ onBackToHub }) {
 
       {/* FEEDBACK Y RESULTADO DE LA RONDA */}
       {roundResult && roundStatus === 'revealed' && (
-        <div className="w-full bg-[#121829] border border-slate-800 p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 animate-fadeIn">
+        <div className="w-full bg-[#121629] border-2 border-slate-700 p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 animate-fadeIn shadow-2xl">
           <div>
-            <h4 className="text-sm font-black text-white">
+            <h4 className="text-base font-black text-white">
               {roundResult.userWonThisRound > 0
-                ? `🎉 ¡Ganaste +${roundResult.userWonThisRound} fichas!`
-                : '❌ No acertaste fichas en la opción correcta'}
+                ? `🎉 ¡Te llevaste +${roundResult.userWonThisRound} fichas limpias!`
+                : '💀 No le pusiste ni una ficha al bicho que era. Las perdiste.'}
             </h4>
-            <p className="text-xs text-slate-300 mt-1">
-              Multiplicador aplicado: <strong className="text-amber-400">{roundResult.multiplierText}</strong> (La IA puso {roundResult.aiPlacedCorrect} fichas en la correcta).
+            <p className="text-xs text-slate-300 mt-1 font-medium">
+              Multiplicador: <strong className="text-amber-400">{roundResult.multiplierText}</strong>. La IA había colocado {roundResult.aiPlacedCorrect} fichas en la opción ganadora.
             </p>
           </div>
 
           <button
             onClick={handleNextRound}
-            className="py-3 px-6 rounded-xl font-black text-xs uppercase text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-lg shadow-indigo-500/25 cursor-pointer"
+            className="py-3 px-6 rounded-xl font-black text-xs uppercase text-slate-950 bg-gradient-to-r from-emerald-400 to-teal-300 hover:from-emerald-300 hover:to-teal-200 shadow-lg shadow-emerald-500/30 cursor-pointer"
           >
             Siguiente Ronda ({round + 1}/{maxRounds}) →
           </button>
@@ -366,13 +379,13 @@ export default function TypeBetting({ onBackToHub }) {
       {/* REPORTE FINAL: 10 RONDAS O SIN FICHAS */}
       {roundStatus === 'gameover' && (
         <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fadeIn">
-          <div className="bg-[#141b2e] border-2 border-amber-500/50 rounded-3xl p-6 md:p-8 max-w-lg w-full text-center shadow-2xl overflow-y-auto max-h-[90vh]">
-            <span className="text-5xl block mb-2">📊</span>
-            <h3 className="text-2xl font-black text-amber-400 uppercase tracking-tight">
-              Reporte Final de Fichas
+          <div className="bg-[#121629] border-2 border-amber-500 rounded-3xl p-6 md:p-8 max-w-lg w-full text-center shadow-[0_0_50px_rgba(245,158,11,0.4)] overflow-y-auto max-h-[90vh]">
+            <span className="text-6xl block mb-2">{chips >= 15 ? '💰' : '📉'}</span>
+            <h3 className="text-3xl font-black text-amber-400 uppercase tracking-tight">
+              {chips >= 15 ? '¡Saliste Forrado del Casino!' : '¡Te dejaron en calzoncillos!'}
             </h3>
-            <p className="text-xs text-slate-300 mt-1">
-              {chips >= 5 ? '¡Has completado las 10 rondas de juego!' : 'Te has quedado sin fichas suficientes para apostar.'}
+            <p className="text-xs text-slate-300 mt-1 font-semibold">
+              {chips >= 5 ? 'Llegaste con vida al final de las 10 rondas de pura especulación.' : 'Te desplumaron las 15 fichas antes de llegar a la ronda 10.'}
             </p>
 
             {/* BALANCE TOTAL */}
@@ -396,7 +409,7 @@ export default function TypeBetting({ onBackToHub }) {
             {/* TABLA HISTÓRICA RESUMEN */}
             <div className="text-left mb-6 max-h-48 overflow-y-auto pr-1">
               <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 mb-2 block">
-                Historial Ronda por Ronda:
+                Historial de apuestas:
               </span>
               <div className="space-y-1.5">
                 {report.roundsHistory.map((item, idx) => (
@@ -418,9 +431,9 @@ export default function TypeBetting({ onBackToHub }) {
             <div className="flex flex-col gap-3">
               <button
                 onClick={startNewGame}
-                className="w-full py-3.5 rounded-xl font-black text-sm uppercase text-white bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 shadow-lg shadow-amber-500/30 transition-all cursor-pointer"
+                className="w-full py-4 rounded-xl font-black text-sm uppercase text-slate-950 bg-gradient-to-r from-amber-400 to-yellow-300 hover:from-amber-300 hover:to-yellow-200 shadow-lg shadow-amber-500/30 transition-all cursor-pointer"
               >
-                Jugar Otra Partida
+                🎰 Echar otra partida
               </button>
               <button
                 onClick={onBackToHub}
