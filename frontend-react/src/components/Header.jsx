@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Header({ currentScreen, onNavigate }) {
+export default function Header({ currentScreen, onNavigate, onOpenLegal }) {
   const activities = [
     { id: 'stat-battle', num: '1', title: '¿Quién tiene más?', short: 'Stats' },
     { id: 'type-duel', num: '2', title: '¿De qué tipo es?', short: 'Alcánzame' },
@@ -21,7 +21,6 @@ export default function Header({ currentScreen, onNavigate }) {
           <div className="relative w-10 h-10 flex items-center justify-center">
             <div className="absolute inset-0 rounded-full bg-gradient-to-r from-red-500 via-indigo-500 to-amber-400 blur-sm opacity-70 group-hover:opacity-100 transition-opacity animate-pulse" />
             <div className="relative w-9 h-9 rounded-full bg-[#131b2e] border-2 border-indigo-400/60 flex items-center justify-center overflow-hidden">
-              {/* Pokébola cibernética */}
               <div className="w-full h-1/2 bg-red-600 border-b border-black/80" />
               <div className="w-full h-1/2 bg-slate-200" />
               <div className="absolute w-3.5 h-3.5 rounded-full bg-white border-2 border-black flex items-center justify-center shadow-sm">
@@ -81,6 +80,18 @@ export default function Header({ currentScreen, onNavigate }) {
               <span className="lg:hidden">{act.short}</span>
             </button>
           ))}
+
+          <div className="h-4 w-px bg-slate-800 hidden sm:block" />
+
+          {/* BOTÓN AVISO LEGAL */}
+          <button
+            onClick={onOpenLegal}
+            className="px-2.5 py-1.5 rounded-xl text-xs font-bold text-amber-300/80 hover:text-amber-200 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition-all flex items-center gap-1 cursor-pointer whitespace-nowrap"
+            title="Aviso Legal: Sin fines de lucro y derechos de Pokémon"
+          >
+            <span>⚖️</span>
+            <span className="hidden sm:inline">Aviso Legal</span>
+          </button>
         </nav>
 
       </div>

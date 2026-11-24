@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export default function CoreHub({ onNavigate }) {
+export default function CoreHub({ onNavigate, onOpenLegal }) {
   const [hoveredActivity, setHoveredActivity] = useState(null);
 
   const activities = [
@@ -67,10 +67,26 @@ export default function CoreHub({ onNavigate }) {
   ];
 
   return (
-    <div className="w-full max-w-6xl mx-auto flex flex-col items-center gap-12 py-6 px-4 animate-fadeIn">
+    <div className="w-full max-w-6xl mx-auto flex flex-col items-center gap-10 py-4 px-4 animate-fadeIn">
       
+      {/* BANNER AVISO LEGAL & PROPIEDAD INTELECTUAL */}
+      <div className="w-full bg-[#11172a]/90 border border-amber-500/30 rounded-2xl p-3 md:px-5 flex flex-wrap items-center justify-between gap-3 text-xs shadow-lg">
+        <div className="flex items-center gap-2.5">
+          <span className="text-lg">⚖️</span>
+          <p className="text-slate-300">
+            <strong className="text-amber-300">Proyecto Educativo 100% Gratuito y Sin Fines de Lucro:</strong> Pokémon y sus elementos multimedia pertenecen a <span className="text-slate-200 font-semibold">© Nintendo / Creatures Inc. / GAME FREAK inc.</span> No se cobra por el uso de esta app ni se ostenta titularidad sobre la marca.
+          </p>
+        </div>
+        <button
+          onClick={onOpenLegal}
+          className="px-3 py-1 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 font-bold text-[11px] transition-colors cursor-pointer whitespace-nowrap"
+        >
+          Leer Aviso Legal Completo →
+        </button>
+      </div>
+
       {/* SECCIÓN DEL NÚCLEO CENTRAL CON ACTIVIDADES ALREDEDOR */}
-      <section className="w-full relative flex flex-col items-center justify-center py-8">
+      <section className="w-full relative flex flex-col items-center justify-center py-4">
         
         {/* Glow de fondo */}
         <div className="absolute w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none -z-10" />
@@ -85,7 +101,7 @@ export default function CoreHub({ onNavigate }) {
             EL NÚCLEO <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-amber-300 to-indigo-400">POKÉMON VS IA</span>
           </h2>
           <p className="text-sm md:text-base text-slate-300 mt-3 leading-relaxed">
-            Aquí no hay equipos ni competencia entre personas: es únicamente el jugador enfrentándose a modelos de Machine Learning (Keras, KNN Logístico y Visión Computacional) impulsados por la PokéAPI oficial.
+            Aquí no hay equipos ni competencia entre personas: es únicamente el jugador enfrentándose a modelos de Machine Learning (Keras, KNN Logístico y Visión Computacional) impulsados por la PokéAPI oficial con soporte completo para formas base, regionales y megas.
           </p>
         </div>
 
@@ -113,18 +129,17 @@ export default function CoreHub({ onNavigate }) {
               CORE KERNEL
             </span>
             <span className="text-[10px] text-slate-400 font-medium mt-0.5">
-              1,215 Pokémon Indexados
+              1,215 Especies & Formas
             </span>
             <span className="text-[9px] text-emerald-400 font-bold bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-500/30 mt-1.5">
-              PokéAPI Online
+              PokéAPI Regional & Megas Online
             </span>
           </div>
 
           {/* LAS 5 ACTIVIDADES ORBITANDO ALREDEDOR */}
           {activities.map((act, index) => {
-            // Posiciones en círculo para los 5 puntos (ángulos 0°, 72°, 144°, 216°, 288° rotados para centrar arriba)
             const angle = (index * (360 / 5) - 90) * (Math.PI / 180);
-            const radius = 230; // Distancia al centro en px
+            const radius = 230;
             const x = Math.round(radius * Math.cos(angle));
             const y = Math.round(radius * Math.sin(angle));
 
@@ -172,7 +187,7 @@ export default function CoreHub({ onNavigate }) {
 
         </div>
 
-        {/* LISTADO DE TARJETAS RESPONSIVE (Móvil y accesibilidad) */}
+        {/* LISTADO DE TARJETAS RESPONSIVE */}
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:mt-8">
           {activities.map(act => (
             <div
@@ -220,7 +235,7 @@ export default function CoreHub({ onNavigate }) {
 
       </section>
 
-      {/* METADATOS TÉCNICOS DE MACHINE LEARNING */}
+      {/* METADATOS TÉCNICOS */}
       <section className="w-full bg-[#111728]/80 border border-slate-800 rounded-3xl p-6 md:p-8 flex flex-wrap items-center justify-between gap-6 shadow-xl">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-2xl">
@@ -228,20 +243,20 @@ export default function CoreHub({ onNavigate }) {
           </div>
           <div>
             <h4 className="text-sm md:text-base font-black text-white">
-              Arquitectura de Inteligencia Artificial Conectada
+              Arquitectura de Inteligencia Artificial & Visión por Computadora
             </h4>
             <p className="text-xs text-slate-400">
-              Modelos cargados: Keras Multicapa (43 In / 6 Out), KNN Ponderado (k=5) y Resonancia Espectral de Aura.
+              Modelos activos: Keras Multicapa (43 In / 6 Out), KNN Ponderado (k=5) y Resonancia Espectral de Aura.
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-3 text-xs">
           <div className="bg-slate-900/90 border border-slate-800 px-3 py-1.5 rounded-xl text-slate-300 font-mono">
-            Datasets: <span className="text-amber-400 font-bold">1,215</span>
+            Especies & Formas: <span className="text-amber-400 font-bold">1,215</span>
           </div>
           <div className="bg-slate-900/90 border border-slate-800 px-3 py-1.5 rounded-xl text-slate-300 font-mono">
-            API: <span className="text-emerald-400 font-bold">PokéAPI Official</span>
+            API: <span className="text-emerald-400 font-bold">PokéAPI (Megas & Regionales)</span>
           </div>
         </div>
       </section>

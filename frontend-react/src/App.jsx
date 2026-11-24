@@ -6,11 +6,13 @@ import TypeDuel from './components/TypeDuel';
 import TypeBetting from './components/TypeBetting';
 import TypeAnalysis from './components/TypeAnalysis';
 import CreatePokemon from './components/CreatePokemon';
+import LegalDisclaimerModal from './components/LegalDisclaimerModal';
 
 export default function App() {
   // Estado de la pantalla activa:
   // 'home' | 'stat-battle' | 'type-duel' | 'type-betting' | 'type-analysis' | 'create-pokemon'
   const [currentScreen, setCurrentScreen] = useState('home');
+  const [isLegalModalOpen, setIsLegalModalOpen] = useState(false);
 
   const handleNavigate = (screen) => {
     setCurrentScreen(screen);
@@ -23,13 +25,17 @@ export default function App() {
       {/* HEADER NAVEGACIÓN */}
       <Header 
         currentScreen={currentScreen} 
-        onNavigate={handleNavigate} 
+        onNavigate={handleNavigate}
+        onOpenLegal={() => setIsLegalModalOpen(true)}
       />
 
       {/* CONTENIDO PRINCIPAL */}
       <main className="flex-1 flex flex-col items-center justify-start p-4 md:p-6 w-full">
         {currentScreen === 'home' && (
-          <CoreHub onNavigate={handleNavigate} />
+          <CoreHub 
+            onNavigate={handleNavigate} 
+            onOpenLegal={() => setIsLegalModalOpen(true)}
+          />
         )}
 
         {currentScreen === 'stat-battle' && (
@@ -53,22 +59,41 @@ export default function App() {
         )}
       </main>
 
-      {/* FOOTER */}
-      <footer className="bg-[#0b101e] border-t border-slate-900 py-6 px-4 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-400">Pokémon vs IA</span>
-            <span>•</span>
-            <span>Plataforma de Trivia y Machine Learning</span>
+      {/* FOOTER CON AVISO LEGAL Y DESLINDE DE RESPONSABILIDAD */}
+      <footer className="bg-[#0b101e] border-t border-slate-900 py-6 px-4 text-xs text-slate-400">
+        <div className="max-w-7xl mx-auto flex flex-col gap-4">
+          
+          <div className="flex flex-col md:flex-row items-center justify-between gap-3 border-b border-slate-900/80 pb-4">
+            <div className="flex items-center gap-2">
+              <span className="font-black text-slate-200">Pokémon vs IA</span>
+              <span>•</span>
+              <span>Plataforma de Trivia & Machine Learning</span>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsLegalModalOpen(true)}
+                className="text-amber-400 hover:text-amber-300 font-bold underline transition-colors cursor-pointer flex items-center gap-1"
+              >
+                <span>⚖️</span> Aviso Legal & Deslinde de Marca
+              </button>
+            </div>
           </div>
 
-          <div className="flex items-center gap-4 text-[11px] text-slate-500">
-            <span>Modelos: Keras & KNN Logístico (k=5)</span>
-            <span>•</span>
-            <span>Imágenes: PokéAPI Oficial</span>
+          <div className="text-[11px] text-slate-400 leading-relaxed text-center sm:text-left">
+            <p>
+              <strong>Deslinde de Responsabilidad de Marca:</strong> Pokémon y los nombres de los personajes son marcas registradas y propiedad intelectual de <strong>Nintendo</strong>, <strong>Creatures Inc.</strong> y <strong>GAME FREAK inc.</strong> Este proyecto web es una iniciativa <strong>estrictamente académica, de código abierto, gratuita y sin fines de lucro</strong>. El autor no es dueño ni posee derechos sobre la marca Pokémon ni sus elementos multimedia; todo el contenido visual, estadístico y de nombres pertenece a sus respectivos dueños. No se cobra por el uso de este software en ninguna de sus formas.
+            </p>
           </div>
+
         </div>
       </footer>
+
+      {/* MODAL DE AVISO LEGAL */}
+      <LegalDisclaimerModal 
+        isOpen={isLegalModalOpen} 
+        onClose={() => setIsLegalModalOpen(false)} 
+      />
 
     </div>
   );
