@@ -7,34 +7,60 @@ import TypeBetting from './components/TypeBetting';
 import TypeAnalysis from './components/TypeAnalysis';
 import CreatePokemon from './components/CreatePokemon';
 import LegalDisclaimerModal from './components/LegalDisclaimerModal';
+import { TypeIcon } from './components/TypeIcons';
+import { TYPE_COLORS, TYPE_ES } from './services/pokemonService';
+import logoEmblem from './assets/logo-emblem.png';
 
 export default function App() {
-  // Estado de la pantalla activa:
-  // 'home' | 'stat-battle' | 'type-duel' | 'type-betting' | 'type-analysis' | 'create-pokemon'
   const [currentScreen, setCurrentScreen] = useState('home');
   const [isLegalModalOpen, setIsLegalModalOpen] = useState(false);
+  const [selectedBgType, setSelectedBgType] = useState(() => {
+    return localStorage.getItem('pokemind_aura_type') || 'Fire';
+  });
+
+  const handleSelectBgType = (type) => {
+    setSelectedBgType(type);
+    localStorage.setItem('pokemind_aura_type', type);
+  };
 
   const handleNavigate = (screen) => {
     setCurrentScreen(screen);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const activeWorld = TYPE_COLORS[selectedBgType] || TYPE_COLORS.Fire;
+
   return (
-    <div className="min-h-screen bg-[#0a0e1a] text-slate-100 flex flex-col justify-between font-sans selection:bg-indigo-500 selection:text-white">
-      
-      {/* HEADER NAVEGACIÓN */}
-      <Header 
-        currentScreen={currentScreen} 
+    <div
+      className="min-h-screen text-[#111827] flex flex-col justify-between relative transition-all duration-700 selection:bg-[#FFD43B] selection:text-[#111827]"
+      style={{ background: activeWorld.worldGradient }}
+    >
+      {/* TEXTURA HALFTONE + FILIGRANA ELEMENTAL EN EL FONDO */}
+      <div className="fixed inset-0 bg-halftone pointer-events-none z-0 opacity-75" />
+      <div className="fixed inset-0 bg-arcade-stripes pointer-events-none z-0 opacity-60" />
+
+      {/* MARCA DE AGUA GIGANTE DEL TIPO ACTIVO */}
+      <div className="fixed -bottom-14 -right-14 pointer-events-none z-0 opacity-[0.14] select-none hidden sm:block transition-all duration-700">
+        <TypeIcon type={selectedBgType} size={340} />
+      </div>
+
+      {/* HEADER CONSOLA ARCADE */}
+      <Header
+        currentScreen={currentScreen}
         onNavigate={handleNavigate}
         onOpenLegal={() => setIsLegalModalOpen(true)}
+        selectedBgType={selectedBgType}
+        onSelectBgType={handleSelectBgType}
       />
 
       {/* CONTENIDO PRINCIPAL */}
-      <main className="flex-1 flex flex-col items-center justify-start p-4 md:p-6 w-full">
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-start px-3 sm:px-5 md:px-8 py-5 md:py-7 w-full">
         {currentScreen === 'home' && (
-          <CoreHub 
-            onNavigate={handleNavigate} 
+          <CoreHub
+            onNavigate={handleNavigate}
             onOpenLegal={() => setIsLegalModalOpen(true)}
+            selectedBgType={selectedBgType}
+            onSelectBgType={handleSelectBgType}
           />
         )}
 
@@ -59,42 +85,52 @@ export default function App() {
         )}
       </main>
 
-      {/* FOOTER CON AVISO LEGAL Y DESLINDE DE RESPONSABILIDAD */}
-      <footer className="bg-[#0b101e] border-t border-slate-900 py-6 px-4 text-xs text-slate-400">
+      {/* FOOTER CON AVISO LEGAL Y MARCA */}
+      <footer className="relative z-10 bg-[#141B29] text-[#F9FAFB] border-t-[3px] border-[#111827] py-6 px-4">
         <div className="max-w-7xl mx-auto flex flex-col gap-4">
-          
-          <div className="flex flex-col md:flex-row items-center justify-between gap-3 border-b border-slate-900/80 pb-4">
-            <div className="flex items-center gap-2">
-              <span className="font-black text-slate-200">PokeMind Games CR</span>
-              <span>•</span>
-              <span>Plataforma de Trivia & Machine Learning</span>
-            </div>
-
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/15 pb-4">
             <div className="flex items-center gap-3">
-              <button
-                onClick={() => setIsLegalModalOpen(true)}
-                className="text-amber-400 hover:text-amber-300 font-bold underline transition-colors cursor-pointer flex items-center gap-1"
-              >
-                <span>⚖️</span> Aviso Legal & Deslinde de Marca
-              </button>
+              <div className="w-10 h-10 rounded-xl bg-[#FFFDF7] border-2 border-[#111827] p-1 flex items-center justify-center shadow-ink-sm shrink-0">
+                <img src={logoEmblem} alt="Logo PokeMind Games CR" className="w-full h-full object-contain" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-display font-extrabold text-base tracking-tight text-white">
+                    POKEMIND GAMES CR
+                  </span>
+                  <span className="font-mono text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-[#D9383A] text-white border border-black/40">
+                    AURA: {TYPE_ES[selectedBgType] || selectedBgType}
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-300">
+                  Consola Arcade Indie contra Modelos de Machine Learning • 100% Gratuita
+                </p>
+              </div>
             </div>
+
+            <button
+              onClick={() => setIsLegalModalOpen(true)}
+              className="arcade-btn bg-[#FFD43B] hover:bg-[#FFE066] text-[#111827] px-4 py-2 rounded-xl font-extrabold text-xs uppercase tracking-wide flex items-center gap-2 cursor-pointer"
+            >
+              <span>Aviso Legal y Derechos de Marca</span>
+            </button>
           </div>
 
-          <div className="text-[11px] text-slate-400 leading-relaxed text-center sm:text-left">
-            <p>
-              <strong>Deslinde de Responsabilidad de Marca:</strong> Pokémon y los nombres de los personajes son marcas registradas y propiedad intelectual de <strong>Nintendo</strong>, <strong>Creatures Inc.</strong> y <strong>GAME FREAK inc.</strong> Este proyecto web (PokeMind Games CR) es una iniciativa <strong>estrictamente académica, de código abierto, gratuita y sin fines de lucro</strong>. El autor no es dueño ni posee derechos sobre la marca Pokémon ni sus elementos multimedia; todo el contenido visual, estadístico y de nombres pertenece a sus respectivos dueños. No se cobra por el uso de este software en ninguna de sus formas.
-            </p>
-          </div>
-
+          <p className="text-[11px] text-slate-300 leading-relaxed">
+            <strong className="text-[#FFD43B]">Deslinde de Responsabilidad:</strong> Pokémon y todos los nombres, diseños y personajes asociados son marcas registradas y propiedad intelectual exclusiva de{' '}
+            <strong className="text-white">Nintendo Co., Ltd.</strong>,{' '}
+            <strong className="text-white">Creatures Inc.</strong> y{' '}
+            <strong className="text-white">GAME FREAK inc.</strong>{' '}
+            PokeMind Games CR es un proyecto independiente, estrictamente académico, gratuito y sin fines de lucro. El autor no es dueño de la marca Pokémon ni cobra un solo colón o dólar por su uso.
+          </p>
         </div>
       </footer>
 
-      {/* MODAL DE AVISO LEGAL */}
-      <LegalDisclaimerModal 
-        isOpen={isLegalModalOpen} 
-        onClose={() => setIsLegalModalOpen(false)} 
+      {/* MODAL LEGAL */}
+      <LegalDisclaimerModal
+        isOpen={isLegalModalOpen}
+        onClose={() => setIsLegalModalOpen(false)}
       />
-
     </div>
   );
 }

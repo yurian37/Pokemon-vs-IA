@@ -1,64 +1,69 @@
-import React, { useState, useEffect } from 'react';
-import { generateTypeDuelRound, TYPE_COLORS } from '../services/pokemonService';
+import React, { useState, useEffect, useCallback } from 'react';
+import { generateTypeDuelRound, TYPE_COLORS, TYPE_ES } from '../services/pokemonService';
 import { aiPredictTypeForDuel } from '../services/mlModelsService';
-import TypeIcon from './TypeIcons';
+import { TypeIcon } from './TypeIcons';
+import { sfx } from '../services/soundService';
 import confetti from 'canvas-confetti';
 
 export default function TypeDuel({ onBackToHub }) {
-  // Puntos del tablero Alcánzame: La IA parte con 5 puntos de ventaja
+  // Regla exacta: La IA arranca con 5 puntos de ventaja
   const [playerScore, setPlayerScore] = useState(0);
   const [aiScore, setAiScore] = useState(5);
   const [roundNumber, setRoundNumber] = useState(1);
 
-  // Datos de la ronda
   const [currentRound, setCurrentRound] = useState(null);
-  const [roundStatus, setRoundStatus] = useState('waiting_user'); // 'waiting_user' | 'user_answered' | 'ai_turn' | 'round_finished' | 'game_won'
-  
-  // Respuestas del turno actual
+  const [roundStatus, setRoundStatus] = useState('waiting_user');
   const [userChoice, setUserChoice] = useState(null);
-  const [aiAttempts, setAiAttempts] = useState({ first: null, second: null, points: 0, firstSuccess: false, secondSuccess: false });
+  const [aiAttempts, setAiAttempts] = useState({
+    first: null,
+    second: null,
+    points: 0,
+    firstSuccess: false,
+    secondSuccess: false,
+  });
   const [roundFeedback, setRoundFeedback] = useState(null);
 
-  // Iniciar primera ronda
-  useEffect(() => {
-    startNewGame();
-  }, []);
-
-  const startNewGame = () => {
-    setPlayerScore(0);
-    setAiScore(5);
-    setRoundNumber(1);
-    setRoundStatus('waiting_user');
-    loadNewRound();
-  };
-
-  const loadNewRound = () => {
+  const loadNewRound = useCallback(() => {
     const round = generateTypeDuelRound();
     setCurrentRound(round);
     setUserChoice(null);
     setAiAttempts({ first: null, second: null, points: 0, firstSuccess: false, secondSuccess: false });
     setRoundFeedback(null);
     setRoundStatus('waiting_user');
-  };
+  }, []);
 
-  const handleUserSelect = async (selectedType) => {
+  const startNewGame = useCallback(() => {
+    sfx.click();
+    setPlayerScore(0);
+    setAiScore(5);
+    setRoundNumber(1);
+    setRoundStatus('waiting_user');
+    loadNewRound();
+  }, [loadNewRound]);
+
+  useEffect(() => {
+    startNewGame();
+  }, [startNewGame]);
+
+  const handleUserSelect = useCallback(async (selectedType) => {
     if (roundStatus !== 'waiting_user' || !currentRound) return;
 
+    sfx.click();
     setUserChoice(selectedType);
     setRoundStatus('user_answered');
 
-    // Comprobar acierto del usuario
     const userIsCorrect = selectedType === currentRound.correctType;
     const userEarned = userIsCorrect ? 2 : 0;
     const newPlayerScore = playerScore + userEarned;
     setPlayerScore(newPlayerScore);
 
-    // Turno de la IA con análisis de la imagen del Pokémon
+    if (userIsCorrect) sfx.win();
+    else sfx.lose();
+
     setRoundStatus('ai_turn');
 
     const aiPrediction = await aiPredictTypeForDuel(currentRound.options, currentRound.pokemon.image);
 
-    // Intento 1 de la IA
     const aiChoice1 = aiPrediction.firstChoice;
     const ai1Correct = aiChoice1 === currentRound.correctType;
 
@@ -67,18 +72,12 @@ export default function TypeDuel({ onBackToHub }) {
     let aiEarned = 0;
 
     if (ai1Correct) {
-      aiEarned = 2; // Acierta a la primera: +2 puntos
+      aiEarned = 2; // Acierta a la 1ª: +2 pts
     } else {
-      // Intento 2: "sabiendo que ya la primera no es, a la segunda"
-      const remainingOptions = currentRound.options.filter(opt => opt !== aiChoice1);
-      // Elige de las restantes
+      const remainingOptions = currentRound.options.filter((opt) => opt !== aiChoice1);
       aiChoice2 = aiPrediction.secondChoice !== aiChoice1 ? aiPrediction.secondChoice : remainingOptions[0];
       ai2Correct = aiChoice2 === currentRound.correctType;
-      if (ai2Correct) {
-        aiEarned = 1; // Acierta a la segunda: +1 punto
-      } else {
-        aiEarned = 0; // No acertó
-      }
+      aiEarned = ai2Correct ? 1 : 0; // Acierta a la 2ª: +1 pt
     }
 
     const newAiScore = aiScore + aiEarned;
@@ -89,7 +88,7 @@ export default function TypeDuel({ onBackToHub }) {
       second: aiChoice2,
       points: aiEarned,
       firstSuccess: ai1Correct,
-      secondSuccess: ai2Correct
+      secondSuccess: ai2Correct,
     });
 
     setRoundFeedback({
@@ -97,315 +96,359 @@ export default function TypeDuel({ onBackToHub }) {
       userEarned,
       aiEarned,
       correctType: currentRound.correctType,
-      pokemonName: currentRound.pokemon.name
+      pokemonName: currentRound.pokemon.name,
     });
 
-    // Condición de Victoria: "El juego se acaba cuando el usuario alcanza a la IA"
     if (newPlayerScore >= newAiScore) {
       setRoundStatus('game_won');
-      confetti({ particleCount: 100, spread: 80, origin: { y: 0.5 } });
+      sfx.fanfare();
+      confetti({ particleCount: 110, spread: 80, origin: { y: 0.5 } });
     } else {
       setRoundStatus('round_finished');
     }
-  };
+  }, [roundStatus, currentRound, playerScore, aiScore]);
 
-  const handleNextRound = () => {
-    setRoundNumber(prev => prev + 1);
+  const handleNextRound = useCallback(() => {
+    sfx.click();
+    setRoundNumber((prev) => prev + 1);
     loadNewRound();
-  };
+  }, [loadNewRound]);
+
+  // Atajos de teclado [1][2][3][4] y Enter para siguiente ronda
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (roundStatus === 'waiting_user' && currentRound) {
+        const idx = ['1', '2', '3', '4'].indexOf(e.key);
+        if (idx !== -1 && currentRound.options[idx]) {
+          handleUserSelect(currentRound.options[idx]);
+        }
+      } else if (roundStatus === 'round_finished' && (e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault();
+        handleNextRound();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [roundStatus, currentRound, handleUserSelect, handleNextRound]);
 
   if (!currentRound) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full" />
+      <div className="flex items-center justify-center min-h-[360px]">
+        <div className="arcade-panel rounded-2xl px-6 py-4 font-mono font-extrabold text-sm">
+          Preparando pista Alcánzame...
+        </div>
       </div>
     );
   }
 
-  // Pista Alcánzame
   const distanceToCatch = Math.max(0, aiScore - playerScore);
-  const maxTrackScore = Math.max(20, Math.max(playerScore, aiScore) + 5);
+  const maxTrackScore = Math.max(16, Math.max(playerScore, aiScore) + 4);
+  const aiPct = Math.min(96, Math.max(6, (aiScore / maxTrackScore) * 100));
+  const playerPct = Math.min(96, Math.max(4, (playerScore / maxTrackScore) * 100));
+  const revealedTheme = TYPE_COLORS[currentRound.correctType] || TYPE_COLORS.Electric;
 
   return (
-    <div className="w-full max-w-5xl mx-auto flex flex-col items-center gap-6 py-4 px-4 animate-fadeIn">
+    <div className="w-full max-w-5xl mx-auto flex flex-col gap-5 animate-fadeIn">
       
-      {/* BARRA SUPERIOR */}
-      <div className="w-full flex flex-wrap items-center justify-between gap-4 bg-[#101426] border border-purple-500/30 p-4 rounded-2xl shadow-xl backdrop-blur-md">
+      {/* HUD SUPERIOR */}
+      <div className="arcade-panel rounded-2xl p-3.5 sm:p-4 flex flex-wrap items-center justify-between gap-3">
         <button
-          onClick={onBackToHub}
-          className="text-xs font-black text-purple-300 hover:text-white flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-purple-500/30 hover:border-purple-400 transition-colors cursor-pointer"
+          onClick={() => {
+            sfx.click();
+            onBackToHub();
+          }}
+          className="arcade-btn bg-white hover:bg-[#F3EFE2] text-[#111827] px-3.5 py-2 rounded-xl font-display font-extrabold text-xs uppercase cursor-pointer"
         >
-          ← Regresar al Antro
+          ← Al Núcleo
         </button>
 
-        <span className="text-xs uppercase tracking-wider font-extrabold text-purple-400 bg-purple-500/10 px-3 py-1 rounded-xl border border-purple-500/20">
-          Cacería Elemental • Tablero Alcánzame
+        <span className="arcade-stamp bg-[#FFD43B] text-[#111827] px-3 py-1 rounded-xl font-mono text-xs font-extrabold uppercase">
+          MODO 02 • TABLERO ALCÁNZAME
         </span>
 
-        <div className="text-xs font-bold text-slate-300">
-          Round <span className="text-amber-400 font-black">#{roundNumber}</span>
+        <div className="font-mono text-xs font-extrabold bg-[#111827] text-white px-3.5 py-1.5 rounded-xl border-2 border-[#111827]">
+          RONDA <span className="text-[#FFD43B]">#{roundNumber}</span>
         </div>
       </div>
 
-      {/* TABLERO ALCÁNZAME (PISTA DE PERSECUCIÓN) */}
-      <div className="w-full bg-[#121629] border-2 border-purple-500/30 rounded-3xl p-6 shadow-2xl relative overflow-hidden">
+      {/* PISTA ALCÁNZAME ESTILO DRAG-STRIP ARCADE */}
+      <div className="arcade-panel rounded-3xl p-4 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">🏃💨</span>
-            <span className="text-xs uppercase font-black text-purple-300 tracking-wider">
-              Pista de Persecución sin Tregua
+          <div>
+            <span className="font-mono text-[10px] font-extrabold uppercase tracking-widest text-[#D9383A] block">
+              PERSECUCIÓN EN VIVO
             </span>
+            <h2 className="font-display font-extrabold text-lg sm:text-xl text-[#111827]">
+              La IA arrancó +5 arriba por tramposa. ¡Cázala!
+            </h2>
           </div>
 
-          <div className="flex items-center gap-4 text-xs font-bold">
-            <span className="text-emerald-400">
-              Tú: <span className="text-white text-base font-black">{playerScore} pts</span>
-            </span>
-            <span className="text-slate-600">|</span>
-            <span className="text-rose-400">
-              IA (+5 inicio tramposo): <span className="text-white text-base font-black">{aiScore} pts</span>
-            </span>
-            <span className="text-slate-600">|</span>
-            <span className="text-amber-400">
-              Brecha: <span className="text-white text-base font-black">{distanceToCatch} pts</span>
+          <div className="arcade-stamp bg-[#111827] text-white px-3.5 py-1.5 rounded-xl font-mono text-xs font-extrabold">
+            BRECHA:{' '}
+            <span className={distanceToCatch === 0 ? 'text-[#4ADE80]' : 'text-[#FFD43B]'}>
+              {distanceToCatch} PTS
             </span>
           </div>
         </div>
 
-        {/* Carril Visual de Progreso */}
-        <div className="space-y-3 relative py-2">
-          {/* Fila IA */}
-          <div className="relative">
-            <div className="flex justify-between text-[10px] text-slate-400 font-bold mb-1">
-              <span>🤖 Modelo tramposo de IA</span>
-              <span className="text-rose-400 font-mono font-bold">{aiScore} pts</span>
+        {/* Carriles físicos */}
+        <div className="space-y-3.5">
+          {/* Carril IA */}
+          <div>
+            <div className="flex justify-between font-mono text-xs font-extrabold mb-1">
+              <span className="text-[#D9383A]">BOT TRAMPOSO (IA)</span>
+              <span className="text-[#111827]">{aiScore} PTS</span>
             </div>
-            <div className="w-full h-5 bg-slate-950 rounded-full overflow-hidden border border-rose-500/30 relative">
-              <div 
-                className="h-full bg-gradient-to-r from-purple-600 via-rose-500 to-amber-500 transition-all duration-700 rounded-full shadow-[0_0_15px_rgba(244,63,94,0.6)]"
-                style={{ width: `${Math.min(100, (aiScore / maxTrackScore) * 100)}%` }}
-              />
+            <div className="w-full h-7 bg-[#F4EFE2] border-[2.5px] border-[#111827] rounded-xl overflow-hidden relative p-0.5">
+              <div
+                className="h-full bg-[#D9383A] rounded-lg transition-all duration-700 flex items-center justify-end pr-2"
+                style={{ width: `${aiPct}%` }}
+              >
+                <span className="font-mono text-[10px] font-extrabold text-white">IA</span>
+              </div>
             </div>
           </div>
 
-          {/* Fila Jugador */}
-          <div className="relative">
-            <div className="flex justify-between text-[10px] text-slate-400 font-bold mb-1">
-              <span>👤 Tu Pellejo (Cazador)</span>
-              <span className="text-emerald-400 font-mono font-bold">{playerScore} pts</span>
+          {/* Carril Jugador */}
+          <div>
+            <div className="flex justify-between font-mono text-xs font-extrabold mb-1">
+              <span className="text-[#15803D]">TÚ (CAZADOR)</span>
+              <span className="text-[#111827]">{playerScore} PTS</span>
             </div>
-            <div className="w-full h-5 bg-slate-950 rounded-full overflow-hidden border border-emerald-500/30 relative">
-              <div 
-                className="h-full bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-300 transition-all duration-700 rounded-full shadow-[0_0_15px_rgba(16,185,129,0.6)]"
-                style={{ width: `${Math.min(100, (playerScore / maxTrackScore) * 100)}%` }}
-              />
+            <div className="w-full h-7 bg-[#F4EFE2] border-[2.5px] border-[#111827] rounded-xl overflow-hidden relative p-0.5">
+              <div
+                className="h-full bg-[#16A34A] rounded-lg transition-all duration-700 flex items-center justify-end pr-2"
+                style={{ width: `${playerPct}%` }}
+              >
+                <span className="font-mono text-[10px] font-extrabold text-white">TÚ</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <p className="text-[11px] text-slate-300 mt-2 text-center font-medium">
-          La IA arrancó 5 puntos arriba porque juega sucio. Tú sumas <strong className="text-emerald-400">+2 pts</strong> si le atinas. Ella tiene 2 tiros (<strong className="text-indigo-400">+2 pts</strong> a la 1ª o <strong className="text-indigo-400">+1 pt</strong> a la 2ª). ¡Cázala o muérete de asco!
+        <p className="text-xs font-semibold text-slate-700 mt-3 bg-[#FFF9DB] border-2 border-[#111827] rounded-xl px-3 py-2">
+          Reglas claras: Si aciertas sumas <strong className="text-[#15803D]">+2 pts</strong>. La IA tiene 2 tiros (<strong className="text-[#D9383A]">+2 pts</strong> a la 1ª o <strong className="text-[#D9383A]">+1 pt</strong> a la 2ª). Ganas en el instante en que la alcanzas.
         </p>
       </div>
 
-      {/* ÁREA DE PREGUNTA: IMAGEN SIN EL NOMBRE Y 4 OPCIONES */}
-      <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+      {/* ZONA DE DUELO: ESPECIE MISTERIOSA (SIN NOMBRE) + 4 PADS ARCADE */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch">
         
-        {/* IMAGEN DEL POKÉMON (SIN EL NOMBRE) */}
-        <div className="md:col-span-5 bg-[#121629] border-2 border-slate-700 rounded-3xl p-6 flex flex-col items-center justify-center shadow-xl relative min-h-[300px]">
-          <span className="text-[10px] uppercase font-black text-amber-400/90 tracking-wider mb-2 bg-amber-950/60 px-3 py-0.5 rounded-full border border-amber-500/30">
-            ¿De qué puto tipo es este bicho?
+        {/* IMAGEN SIN NOMBRE */}
+        <div
+          className="md:col-span-5 rounded-3xl border-[3px] border-[#111827] shadow-ink-lg p-5 flex flex-col items-center justify-between relative overflow-hidden"
+          style={{
+            background:
+              roundStatus === 'round_finished' || roundStatus === 'game_won'
+                ? revealedTheme.bgGradientCss
+                : 'linear-gradient(135deg, #1E3A5F 0%, #111827 100%)',
+          }}
+        >
+          <div className="absolute inset-0 bg-halftone-light opacity-45 pointer-events-none" />
+
+          <span className="relative z-10 arcade-stamp bg-[#FFD43B] text-[#111827] font-mono text-[11px] font-extrabold uppercase px-3 py-1 rounded-xl">
+            {roundStatus === 'waiting_user' ? '¿DE QUÉ CARAJOS ES ESTE BICHO?' : 'IDENTIDAD REVELADA'}
           </span>
 
-          <div className="w-48 h-48 flex items-center justify-center my-2 relative bg-black/30 rounded-2xl p-2">
-            <img 
-              src={currentRound.pokemon.image} 
-              alt="Pokemon Misterioso"
+          <div className="relative z-10 w-52 h-52 my-4 rounded-2xl bg-[#FFFDF7] border-[3px] border-[#111827] shadow-ink flex items-center justify-center p-3">
+            <img
+              src={currentRound.pokemon.image}
+              alt="Pokémon misterioso sin nombre"
               onError={(e) => { e.target.src = currentRound.pokemon.thumbnail; }}
-              className="max-w-full max-h-full object-contain filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.8)] animate-pulse"
+              className="max-w-full max-h-full object-contain drop-shadow-[0_10px_14px_rgba(17,24,39,0.35)] animate-floatSlow"
             />
           </div>
 
-          <div className="mt-2 text-center">
+          <div className="relative z-10 w-full text-center">
             {roundStatus === 'round_finished' || roundStatus === 'game_won' ? (
-              <div className="animate-fadeIn">
-                <h4 className="text-xl font-black text-white">{currentRound.pokemon.name}</h4>
-                <div className="flex justify-center gap-1.5 mt-1.5">
-                  <span 
-                    className="text-[10px] font-black px-2.5 py-1 rounded-xl text-white flex items-center gap-1 shadow"
-                    style={{ backgroundColor: TYPE_COLORS[currentRound.pokemon.type1]?.bg || '#666' }}
-                  >
-                    <TypeIcon type={currentRound.pokemon.type1} className="w-3 h-3 fill-current" />
-                    {currentRound.pokemon.type1}
+              <div className="bg-[#FFFDF7] border-2 border-[#111827] rounded-2xl p-3 shadow-ink-sm animate-popIn">
+                <h4 className="font-display font-extrabold text-xl text-[#111827]">
+                  {currentRound.pokemon.name}
+                </h4>
+                <div className="flex flex-wrap justify-center gap-1.5 mt-1.5">
+                  <span className="arcade-stamp bg-white text-[#111827] text-xs font-extrabold px-2.5 py-0.5 rounded-lg flex items-center gap-1">
+                    <TypeIcon type={currentRound.pokemon.type1} size={14} />
+                    {TYPE_ES[currentRound.pokemon.type1] || currentRound.pokemon.type1}
                   </span>
                   {currentRound.pokemon.type2 && (
-                    <span 
-                      className="text-[10px] font-black px-2.5 py-1 rounded-xl text-white flex items-center gap-1 shadow"
-                      style={{ backgroundColor: TYPE_COLORS[currentRound.pokemon.type2]?.bg || '#666' }}
-                    >
-                      <TypeIcon type={currentRound.pokemon.type2} className="w-3 h-3 fill-current" />
-                      {currentRound.pokemon.type2}
+                    <span className="arcade-stamp bg-white text-[#111827] text-xs font-extrabold px-2.5 py-0.5 rounded-lg flex items-center gap-1">
+                      <TypeIcon type={currentRound.pokemon.type2} size={14} />
+                      {TYPE_ES[currentRound.pokemon.type2] || currentRound.pokemon.type2}
                     </span>
                   )}
                 </div>
               </div>
             ) : (
-              <span className="text-xs font-black text-slate-300">
-                ¡Mírale la jeta y elige abajo!
+              <span className="font-mono text-xs font-extrabold text-white/95 bg-[#111827]/70 px-3 py-1.5 rounded-xl border border-white/20 inline-block">
+                Sin nombre • Usa teclas [1] [2] [3] [4]
               </span>
             )}
           </div>
         </div>
 
-        {/* 4 OPCIONES DE TIPO */}
-        <div className="md:col-span-7 flex flex-col gap-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {currentRound.options.map((typeOption, idx) => {
-              const typeStyle = TYPE_COLORS[typeOption] || { bg: '#334155', text: '#fff' };
-              const isSelected = userChoice === typeOption;
-              const isCorrect = typeOption === currentRound.correctType;
-              const isRevealed = roundStatus !== 'waiting_user';
+        {/* 4 PADS DE TIPOS + TERMINAL DE LA IA */}
+        <div className="md:col-span-7 flex flex-col justify-between gap-4">
+          <div className="arcade-panel rounded-3xl p-4 sm:p-5 flex flex-col gap-3">
+            <span className="font-mono text-[11px] font-extrabold uppercase tracking-wider text-slate-600">
+              Elige el tipo correcto (los 3 distractores jamás coinciden con ninguno de sus tipos)
+            </span>
 
-              let buttonStyle = 'bg-[#151c33] border-slate-700 hover:border-purple-400 text-slate-200';
-              if (isRevealed) {
-                if (isCorrect) {
-                  buttonStyle = 'bg-emerald-600 border-emerald-300 text-white shadow-lg shadow-emerald-500/40 scale-[1.02]';
-                } else if (isSelected && !isCorrect) {
-                  buttonStyle = 'bg-rose-600/80 border-rose-400 text-white opacity-80';
-                } else {
-                  buttonStyle = 'bg-slate-900 border-slate-800 text-slate-500 opacity-60';
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {currentRound.options.map((typeOption, idx) => {
+                const typeStyle = TYPE_COLORS[typeOption] || TYPE_COLORS.Normal;
+                const isSelected = userChoice === typeOption;
+                const isCorrect = typeOption === currentRound.correctType;
+                const isRevealed = roundStatus !== 'waiting_user';
+
+                let padClasses = 'bg-[#FFFDF7] text-[#111827] hover:bg-[#FFF9DB]';
+                let customBg = undefined;
+
+                if (isRevealed) {
+                  if (isCorrect) {
+                    padClasses = 'text-white ring-4 ring-[#4ADE80]';
+                    customBg = typeStyle.bgGradientCss;
+                  } else if (isSelected && !isCorrect) {
+                    padClasses = 'bg-[#FFE3E3] text-[#991B1B] opacity-90';
+                  } else {
+                    padClasses = 'bg-slate-100 text-slate-500 opacity-60';
+                  }
                 }
-              }
 
-              return (
-                <button
-                  key={typeOption}
-                  disabled={roundStatus !== 'waiting_user'}
-                  onClick={() => handleUserSelect(typeOption)}
-                  className={`p-4 rounded-2xl border-2 font-black text-sm uppercase tracking-wider flex items-center justify-between transition-all duration-200 cursor-pointer ${buttonStyle}`}
-                >
-                  <span className="flex items-center gap-2.5">
-                    <span className="w-7 h-7 rounded-lg bg-slate-950/60 text-[11px] flex items-center justify-center font-mono font-bold text-amber-400 border border-slate-700">
-                      {['A', 'B', 'C', 'D'][idx]}
-                    </span>
-                    <span className="flex items-center gap-2">
-                      <span className="w-5 h-5 flex items-center justify-center">
-                        <TypeIcon type={typeOption} className="w-5 h-5" />
+                return (
+                  <button
+                    key={typeOption}
+                    disabled={roundStatus !== 'waiting_user'}
+                    onClick={() => handleUserSelect(typeOption)}
+                    style={{ background: customBg }}
+                    className={`arcade-btn rounded-2xl p-3.5 flex items-center justify-between gap-2 cursor-pointer text-left ${padClasses}`}
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="font-mono text-xs font-extrabold w-7 h-7 rounded-lg bg-[#111827] text-[#FFD43B] flex items-center justify-center shrink-0">
+                        {idx + 1}
                       </span>
-                      <span>{typeOption}</span>
-                    </span>
-                  </span>
+                      <div className="w-9 h-9 rounded-xl bg-white border-2 border-[#111827] flex items-center justify-center shrink-0 shadow-sm">
+                        <TypeIcon type={typeOption} size={22} />
+                      </div>
+                      <div className="min-w-0">
+                        <span className="font-display font-extrabold text-base block leading-none truncate">
+                          {TYPE_ES[typeOption] || typeOption}
+                        </span>
+                        <span className="font-mono text-[10px] font-bold uppercase opacity-75">
+                          {typeOption}
+                        </span>
+                      </div>
+                    </div>
 
-                  <span 
-                    className="w-4 h-4 rounded-full border border-white/40 shadow-inner"
-                    style={{ backgroundColor: typeStyle.bg }}
-                  />
-                </button>
-              );
-            })}
+                    <span
+                      className="w-4 h-4 rounded-full border-2 border-[#111827] shrink-0"
+                      style={{ backgroundColor: typeStyle.bg }}
+                    />
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          {/* ESTADO DEL TURNO DE LA IA Y FEEDBACK */}
+          {/* TERMINAL DE TURNO DE LA IA */}
           {roundStatus === 'ai_turn' && (
-            <div className="p-4 rounded-2xl bg-[#141b2e] border border-purple-500/40 flex items-center gap-3 animate-pulse">
-              <div className="animate-spin w-5 h-5 border-2 border-purple-400 border-t-transparent rounded-full" />
-              <span className="text-xs text-purple-300 font-bold">
-                La IA está procesando los píxeles con su red neuronal...
-              </span>
+            <div className="arcade-panel-dark text-[#FFD43B] rounded-2xl p-4 font-mono text-xs font-extrabold animate-pulse">
+              La IA está analizando los píxeles del bicho con sus 2 intentos...
             </div>
           )}
 
           {roundFeedback && (
-            <div className="p-4 rounded-2xl bg-[#121629] border-2 border-slate-800 space-y-2 animate-fadeIn text-xs">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                <span className="text-slate-200 font-black">
-                  Tu Tiro: {roundFeedback.userIsCorrect ? '🎯 ¡Le diste! (+2 pts)' : '💩 ¡La cagaste! (+0 pts)'}
+            <div className="arcade-panel rounded-2xl p-4 space-y-2.5 animate-popIn">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-dashed border-[#111827]/20 pb-2">
+                <span className="font-display font-extrabold text-base text-[#111827]">
+                  {roundFeedback.userIsCorrect
+                    ? '¡Toma ya! Le atinaste (+2 pts)'
+                    : '¡Fallaste! Cero puntos para tu cuenta'}
                 </span>
-                <span className="text-slate-300 font-semibold flex items-center gap-1.5">
-                  Tipo real: 
-                  <span className="text-white font-black px-2 py-0.5 rounded bg-slate-800 border border-slate-700 flex items-center gap-1">
-                    <TypeIcon type={roundFeedback.correctType} className="w-3.5 h-3.5" />
-                    {roundFeedback.correctType}
-                  </span>
+                <span className="arcade-stamp bg-[#FFD43B] text-[#111827] font-mono text-xs font-extrabold px-2.5 py-0.5 rounded-lg flex items-center gap-1.5">
+                  <TypeIcon type={roundFeedback.correctType} size={14} />
+                  {TYPE_ES[roundFeedback.correctType] || roundFeedback.correctType}
                 </span>
               </div>
 
-              <div className="text-slate-300 space-y-1 pt-1 font-medium">
-                <div className="flex items-center justify-between">
-                  <span>Intento 1 IA: <strong className="text-white">{aiAttempts.first}</strong></span>
-                  <span>{aiAttempts.firstSuccess ? '✅ ¡Acertó a la 1ª! (+2 pts)' : '❌ Falló como un perro'}</span>
+              <div className="font-mono text-xs font-bold space-y-1 text-slate-800">
+                <div className="flex justify-between gap-2">
+                  <span>1er Tiro IA: <strong>{TYPE_ES[aiAttempts.first] || aiAttempts.first}</strong></span>
+                  <span className={aiAttempts.firstSuccess ? 'text-[#D9383A]' : 'text-[#15803D]'}>
+                    {aiAttempts.firstSuccess ? 'Acertó a la 1ª (+2 pts)' : 'Falló el 1er tiro'}
+                  </span>
                 </div>
                 {!aiAttempts.firstSuccess && (
-                  <div className="flex items-center justify-between">
-                    <span>Intento 2 IA: <strong className="text-white">{aiAttempts.second}</strong></span>
-                    <span>{aiAttempts.secondSuccess ? '✅ ¡Rescató a la 2ª! (+1 pt)' : '❌ ¡Volvió a fallar! (+0 pts)'}</span>
+                  <div className="flex justify-between gap-2">
+                    <span>2do Tiro IA: <strong>{TYPE_ES[aiAttempts.second] || aiAttempts.second}</strong></span>
+                    <span className={aiAttempts.secondSuccess ? 'text-[#D9383A]' : 'text-[#15803D]'}>
+                      {aiAttempts.secondSuccess ? 'Rescató a la 2ª (+1 pt)' : 'Volvió a fallar (+0 pts)'}
+                    </span>
                   </div>
                 )}
               </div>
+
+              {roundStatus === 'round_finished' && (
+                <button
+                  onClick={handleNextRound}
+                  className="arcade-btn w-full py-3 rounded-xl bg-[#111827] hover:bg-[#1E3A5F] text-[#FFD43B] font-display font-extrabold text-sm uppercase cursor-pointer mt-1"
+                >
+                  Siguiente Bicho [Enter] →
+                </button>
+              )}
             </div>
           )}
-
-          {/* BOTÓN SIGUIENTE RONDA */}
-          {roundStatus === 'round_finished' && (
-            <button
-              onClick={handleNextRound}
-              className="w-full py-4 rounded-2xl font-black text-sm uppercase text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 shadow-lg shadow-purple-500/30 transition-all cursor-pointer"
-            >
-              ¡Siguiente Bicho, Dale! →
-            </button>
-          )}
-
         </div>
-
       </div>
 
-      {/* MODAL VICTORIA CUANDO EL USUARIO ALCANZA A LA IA */}
+      {/* MODAL VICTORIA */}
       {roundStatus === 'game_won' && (
-        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fadeIn">
-          <div className="bg-[#121629] border-2 border-emerald-400 rounded-3xl p-8 max-w-md w-full text-center shadow-[0_0_50px_rgba(16,185,129,0.4)]">
-            <span className="text-6xl block mb-2">🏆</span>
-            <h3 className="text-3xl font-black text-emerald-400 uppercase tracking-tight">
+        <div className="fixed inset-0 bg-[#111827]/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn">
+          <div className="arcade-panel rounded-3xl p-6 sm:p-8 max-w-md w-full text-center animate-popIn">
+            <span className="arcade-stamp inline-block bg-[#16A34A] text-white font-mono text-xs font-extrabold uppercase px-3 py-1 rounded-lg -rotate-2 mb-3">
+              CAZASTE A LA MÁQUINA
+            </span>
+            <h3 className="font-display font-extrabold text-3xl text-[#111827] uppercase">
               ¡Le callaste el hocico a la IA!
             </h3>
-            <p className="text-xs text-slate-300 mt-2 leading-relaxed font-semibold">
-              ¡Te merendaste los 5 puntos de ventaja que se había clavado la máquina tramposa! Has ganado el duelo limpio.
+            <p className="text-xs sm:text-sm font-semibold text-slate-700 mt-1.5">
+              Le remontaste los 5 puntos de ventaja tramposa y la dejaste comiendo polvo en {roundNumber} rondas.
             </p>
 
-            <div className="my-6 p-4 rounded-2xl bg-slate-900 border border-slate-800 flex justify-around">
-              <div>
-                <span className="text-[10px] text-slate-400 uppercase font-bold block">Tus Puntos</span>
-                <span className="text-3xl font-black text-emerald-400">{playerScore}</span>
+            <div className="grid grid-cols-3 gap-2 my-5">
+              <div className="bg-[#EBFBEE] border-2 border-[#111827] rounded-xl p-2.5">
+                <span className="font-mono text-[10px] font-bold uppercase text-slate-600 block">Tú</span>
+                <span className="font-display font-extrabold text-2xl text-[#15803D]">{playerScore}</span>
               </div>
-              <div className="w-px bg-slate-800" />
-              <div>
-                <span className="text-[10px] text-slate-400 uppercase font-bold block">Puntos IA</span>
-                <span className="text-3xl font-black text-rose-400">{aiScore}</span>
+              <div className="bg-[#FFE3E3] border-2 border-[#111827] rounded-xl p-2.5">
+                <span className="font-mono text-[10px] font-bold uppercase text-slate-600 block">IA</span>
+                <span className="font-display font-extrabold text-2xl text-[#D9383A]">{aiScore}</span>
               </div>
-              <div className="w-px bg-slate-800" />
-              <div>
-                <span className="text-[10px] text-slate-400 uppercase font-bold block">Rounds</span>
-                <span className="text-3xl font-black text-amber-400">{roundNumber}</span>
+              <div className="bg-[#FFF9DB] border-2 border-[#111827] rounded-xl p-2.5">
+                <span className="font-mono text-[10px] font-bold uppercase text-slate-600 block">Rondas</span>
+                <span className="font-display font-extrabold text-2xl text-[#111827]">{roundNumber}</span>
               </div>
             </div>
 
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2.5">
               <button
                 onClick={startNewGame}
-                className="w-full py-4 rounded-xl font-black text-sm uppercase text-slate-950 bg-gradient-to-r from-emerald-400 to-teal-300 hover:from-emerald-300 hover:to-teal-200 shadow-lg shadow-emerald-500/30 transition-all cursor-pointer"
+                className="arcade-btn w-full py-3.5 rounded-2xl bg-[#FFD43B] hover:bg-[#FFE066] text-[#111827] font-display font-extrabold text-sm uppercase cursor-pointer"
               >
-                🎮 Otra paliza a la IA
+                Darle Otra Paliza a la IA
               </button>
               <button
-                onClick={onBackToHub}
-                className="w-full py-2.5 rounded-xl font-bold text-xs text-slate-400 hover:text-white bg-slate-900 hover:bg-slate-800 transition-colors cursor-pointer"
+                onClick={() => {
+                  sfx.click();
+                  onBackToHub();
+                }}
+                className="arcade-btn w-full py-2.5 rounded-2xl bg-white hover:bg-slate-100 text-[#111827] font-bold text-xs uppercase cursor-pointer"
               >
-                Volver al Antro con tu corona
+                Volver al Núcleo
               </button>
             </div>
           </div>
         </div>
       )}
-
     </div>
   );
 }

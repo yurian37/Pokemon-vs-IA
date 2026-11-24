@@ -1,85 +1,84 @@
 import React from 'react';
+import logoEmblem from '../assets/logo-emblem.png';
 
 export default function LegalDisclaimerModal({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn">
-      <div className="bg-[#121829] border-2 border-indigo-500/40 rounded-3xl p-6 md:p-8 max-w-2xl w-full shadow-2xl relative overflow-hidden max-h-[90vh] flex flex-col justify-between">
+    <div
+      className="fixed inset-0 bg-[#111827]/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="legal-modal-title"
+    >
+      <div className="arcade-panel rounded-3xl p-6 md:p-8 max-w-2xl w-full relative overflow-hidden max-h-[90vh] flex flex-col justify-between">
         
-        {/* Glow decorativo */}
-        <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-
         {/* CABECERA */}
-        <div className="flex items-start justify-between border-b border-slate-800 pb-4 mb-4">
+        <div className="flex items-start justify-between gap-4 border-b-[2.5px] border-[#111827] pb-4 mb-4">
           <div className="flex items-center gap-3">
-            <span className="text-3xl">⚖️</span>
+            <div className="w-12 h-12 rounded-2xl bg-[#FFFDF7] border-2 border-[#111827] shadow-ink-sm p-1.5 shrink-0">
+              <img src={logoEmblem} alt="PokeMind Games CR" className="w-full h-full object-contain" />
+            </div>
             <div>
-              <h3 className="text-lg md:text-xl font-black text-white">
-                Aviso Legal & Deslinde de Responsabilidad
+              <h3 id="legal-modal-title" className="font-display font-extrabold text-xl md:text-2xl text-[#111827]">
+                Aviso Legal y Deslinde de Marca
               </h3>
-              <span className="text-xs text-indigo-400 font-bold uppercase tracking-wider">
-                PokeMind Games CR • Uso Educativo, Libre y Sin Fines de Lucro
+              <span className="font-mono text-[11px] font-extrabold uppercase tracking-wider text-[#D9383A]">
+                PokeMind Games CR • Proyecto Educativo 100% Gratuito
               </span>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center font-bold text-sm transition-colors cursor-pointer"
+            className="arcade-btn w-9 h-9 rounded-xl bg-[#D9383A] text-white font-mono font-extrabold text-sm flex items-center justify-center cursor-pointer shrink-0"
+            aria-label="Cerrar aviso legal"
           >
             ✕
           </button>
         </div>
 
-        {/* CONTENIDO DEL AVISO */}
-        <div className="space-y-4 text-xs text-slate-300 leading-relaxed overflow-y-auto pr-2">
-          
-          <div className="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl">
-            <h4 className="text-sm font-black text-amber-300 mb-1 flex items-center gap-2">
-              <span>🛡️</span> Titularidad y Derechos de la Marca Pokémon
+        {/* CONTENIDO */}
+        <div className="space-y-3.5 text-xs sm:text-sm text-slate-800 leading-relaxed overflow-y-auto pr-1">
+          <div className="bg-[#FFF9DB] border-2 border-[#111827] p-4 rounded-2xl shadow-ink-sm">
+            <h4 className="font-display font-extrabold text-sm text-[#111827] mb-1 uppercase">
+              1. Titularidad de la Marca Pokémon
             </h4>
             <p>
-              El autor y desarrollador de <strong>PokeMind Games CR</strong> declara que <strong>NO es dueño ni titular de la marca Pokémon</strong>, ni posee derechos de autor o marcas registradas sobre los personajes, nombres, diseños, ilustraciones, logotipos ni universo de Pokémon. 
+              El autor de <strong>PokeMind Games CR</strong> declara expresamente que <strong>NO es dueño ni titular de la marca Pokémon</strong>, ni posee derechos sobre sus personajes, nombres, ilustraciones, sprites o universo.
             </p>
-            <p className="mt-1.5 text-slate-400">
-              <strong>Pokémon</strong>, los nombres de los Pokémon, ilustraciones, estadísticas y elementos asociados son marcas comerciales y derechos de autor propiedad exclusiva de <strong>Nintendo Co., Ltd.</strong>, <strong>Creatures Inc.</strong> y <strong>Game Freak Inc.</strong> Todos los derechos reservados a sus respectivos creadores.
+            <p className="mt-1.5 text-slate-700">
+              <strong>Pokémon</strong> y todos los elementos relacionados son marcas registradas propiedad exclusiva de <strong>Nintendo Co., Ltd.</strong>, <strong>Creatures Inc.</strong> y <strong>GAME FREAK inc.</strong> Todos los derechos pertenecen a sus legítimos titulares.
             </p>
           </div>
 
-          <div className="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl">
-            <h4 className="text-sm font-black text-emerald-300 mb-1 flex items-center gap-2">
-              <span>🎁</span> 100% Gratuita, Sin Cobro y Sin Fines de Lucro
+          <div className="bg-[#EBFBEE] border-2 border-[#111827] p-4 rounded-2xl shadow-ink-sm">
+            <h4 className="font-display font-extrabold text-sm text-[#111827] mb-1 uppercase">
+              2. Uso 100% Gratuito y Sin Fines de Lucro
             </h4>
             <p>
-              Esta aplicación web es <strong>completamente gratuita y de acceso público</strong>. En ninguna circunstancia se cobra dinero por su utilización, no existen muros de pago (paywalls), no hay microtransacciones, compras integradas, planes de pago ni monetización de ningún tipo. Su propósito es única y exclusivamente pedagógico y de demostración técnica en Machine Learning.
+              Esta aplicación web es <strong>totalmente gratuita y sin fines comerciales</strong>. No se cobra dinero bajo ninguna modalidad, no existen suscripciones, compras integradas ni monetización. Fue creada únicamente con propósito académico y de experimentación con modelos de Machine Learning.
             </p>
           </div>
 
-          <div className="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl">
-            <h4 className="text-sm font-black text-cyan-300 mb-1 flex items-center gap-2">
-              <span>🌐</span> Fuente de Datos y Uso Justo (Fair Use)
+          <div className="bg-[#E7F5FF] border-2 border-[#111827] p-4 rounded-2xl shadow-ink-sm">
+            <h4 className="font-display font-extrabold text-sm text-[#111827] mb-1 uppercase">
+              3. Fuente de Datos (PokéAPI) y Uso Justo
             </h4>
             <p>
-              Las imágenes oficiales y metadatos estadísticos son obtenidos a través de la API pública y gratuita de <strong>PokéAPI</strong> (recursos comunitarios sin fines de lucro). El uso de estos materiales se realiza bajo los principios de <em>Uso Legítimo</em> (Fair Use) con fines de experimentación en algoritmos de visión por computadora (convolución espectral) y regresión (KNN Logístico).
+              Las imágenes oficiales (incluyendo formas regionales Alola, Galar, Hisui, Paldea y Megaevoluciones) se consultan dinámicamente desde la API pública y gratuita <strong>PokéAPI</strong> bajo principios de uso educativo y no comercial.
             </p>
           </div>
-
-          <div className="text-[11px] text-slate-400 italic text-center">
-            Este software es un proyecto independiente desarrollado por estudiantes e investigadores de IA y no cuenta con afiliación, respaldo o patrocinio oficial de The Pokémon Company, Nintendo ni Game Freak.
-          </div>
-
         </div>
 
-        {/* PIE DEL MODAL */}
-        <div className="pt-4 border-t border-slate-800 mt-4 flex justify-end">
+        {/* PIE */}
+        <div className="pt-4 border-t-[2.5px] border-[#111827] mt-4 flex justify-end">
           <button
             onClick={onClose}
-            className="py-2.5 px-6 rounded-xl font-bold text-xs uppercase text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-500/20 transition-all cursor-pointer"
+            className="arcade-btn bg-[#FFD43B] hover:bg-[#FFE066] text-[#111827] py-2.5 px-6 rounded-xl font-display font-extrabold text-sm uppercase cursor-pointer"
           >
-            Entendido y Aceptar
+            Entendido, a Jugar
           </button>
         </div>
-
       </div>
     </div>
   );

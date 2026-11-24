@@ -1,62 +1,58 @@
-import React, { useState, useEffect } from 'react';
-import { generateTypeBettingRound, TYPE_COLORS } from '../services/pokemonService';
+import React, { useState, useEffect, useCallback } from 'react';
+import { generateTypeBettingRound, TYPE_COLORS, TYPE_ES } from '../services/pokemonService';
 import { aiPredictTypeBetting } from '../services/mlModelsService';
-import TypeIcon from './TypeIcons';
+import { TypeIcon } from './TypeIcons';
+import { sfx } from '../services/soundService';
 import confetti from 'canvas-confetti';
 
 export default function TypeBetting({ onBackToHub }) {
-  // Saldo de fichas: inicia con 15
+  // Regla exacta: 15 fichas iniciales, 10 rondas máx, 5 fichas por ronda
   const [chips, setChips] = useState(15);
   const [round, setRound] = useState(1);
   const maxRounds = 10;
 
-  // Reporte acumulado de fichas ganadas y perdidas
   const [report, setReport] = useState({
     totalWon: 0,
     totalLost: 0,
-    roundsHistory: []
+    roundsHistory: [],
   });
 
-  // Estado de la ronda
   const [currentRoundData, setCurrentRoundData] = useState(null);
-  const [userBets, setUserBets] = useState([0, 0, 0]); // 5 fichas a repartir entre las 3 opciones
-  const [aiBets, setAiBets] = useState([0, 0, 0]);     // 3 en primera opción, 2 en segunda opción
+  const [userBets, setUserBets] = useState([0, 0, 0]);
+  const [aiBets, setAiBets] = useState([0, 0, 0]);
   const [roundStatus, setRoundStatus] = useState('betting'); // 'betting' | 'revealed' | 'gameover'
   const [roundResult, setRoundResult] = useState(null);
 
-  // Iniciar partida
-  useEffect(() => {
-    startNewGame();
-  }, []);
-
-  const startNewGame = () => {
-    setChips(15);
-    setRound(1);
-    setReport({ totalWon: 0, totalLost: 0, roundsHistory: [] });
-    loadRound();
-  };
-
-  const loadRound = () => {
+  const loadRound = useCallback(() => {
     const roundData = generateTypeBettingRound();
     setCurrentRoundData(roundData);
     setUserBets([0, 0, 0]);
     setAiBets([0, 0, 0]);
     setRoundResult(null);
     setRoundStatus('betting');
-  };
+  }, []);
 
-  // Ajustar apuesta en una de las 3 opciones (índice 0, 1, 2)
+  const startNewGame = useCallback(() => {
+    sfx.click();
+    setChips(15);
+    setRound(1);
+    setReport({ totalWon: 0, totalLost: 0, roundsHistory: [] });
+    loadRound();
+  }, [loadRound]);
+
+  useEffect(() => {
+    startNewGame();
+  }, [startNewGame]);
+
   const totalBet = userBets.reduce((a, b) => a + b, 0);
   const remainingToPlace = 5 - totalBet;
 
   const handleAddBet = (index, amount) => {
     if (roundStatus !== 'betting') return;
-    const current = userBets[index];
-    const newBet = current + amount;
-
+    const newBet = userBets[index] + amount;
     if (newBet < 0) return;
     if (amount > 0 && remainingToPlace < amount) return;
-
+    sfx.chip();
     const nextBets = [...userBets];
     nextBets[index] = newBet;
     setUserBets(nextBets);
@@ -64,43 +60,35 @@ export default function TypeBetting({ onBackToHub }) {
 
   const handlePlaceAllOn = (index) => {
     if (roundStatus !== 'betting') return;
+    sfx.chip();
     const nextBets = [0, 0, 0];
     nextBets[index] = 5;
     setUserBets(nextBets);
   };
 
-  // Confirmar y resolver la ronda
   const handleConfirmBets = async () => {
     if (totalBet !== 5 || !currentRoundData) return;
 
-    // Calcular apuestas de la IA
     const aiPrediction = await aiPredictTypeBetting(currentRoundData.options, currentRoundData.targetType);
     const nextAiBets = [0, 0, 0];
-    nextAiBets[aiPrediction.firstChoiceIndex] = 3;  // 3 fichas en 1ra opción
-    nextAiBets[aiPrediction.secondChoiceIndex] = 2; // 2 fichas en 2da opción
+    nextAiBets[aiPrediction.firstChoiceIndex] = 3;
+    nextAiBets[aiPrediction.secondChoiceIndex] = 2;
     setAiBets(nextAiBets);
 
-    // Resolver pagos
     const correctIdx = currentRoundData.correctIndex;
     const userPlacedCorrect = userBets[correctIdx];
     const aiPlacedCorrect = nextAiBets[correctIdx];
 
     let userWonThisRound = 0;
-
     if (userPlacedCorrect > 0) {
-      if (aiPlacedCorrect === 0) {
-        // "Si el usuario acierta y la IA no coloca ninguna ficha, se le triplica lo colocado"
-        userWonThisRound = userPlacedCorrect * 3;
-      } else if (aiPlacedCorrect === 2) {
-        // "si la IA coloca 2 fichas se le duplica lo colocado"
-        userWonThisRound = userPlacedCorrect * 2;
-      } else if (aiPlacedCorrect === 3) {
-        // "y si la IA coloco 3 fichas se le da el rendondeo para arriba de la multiplicacion x1.5"
-        userWonThisRound = Math.ceil(userPlacedCorrect * 1.5);
-      }
+      if (aiPlacedCorrect === 0) userWonThisRound = userPlacedCorrect * 3;
+      else if (aiPlacedCorrect === 2) userWonThisRound = userPlacedCorrect * 2;
+      else if (aiPlacedCorrect === 3) userWonThisRound = Math.ceil(userPlacedCorrect * 1.5);
     }
 
-    // Fichas perdidas: las 5 apostadas menos las que devolvieron ganancia (o net lost)
+    if (userWonThisRound > 0) sfx.win();
+    else sfx.lose();
+
     const chipsLostThisRound = 5 - userPlacedCorrect;
     const newChips = chips - 5 + userWonThisRound;
     setChips(newChips);
@@ -113,13 +101,13 @@ export default function TypeBetting({ onBackToHub }) {
       aiPlacedCorrect,
       userWonThisRound,
       chipsLostThisRound,
-      endingChips: newChips
+      endingChips: newChips,
     };
 
-    setReport(prev => ({
+    setReport((prev) => ({
       totalWon: prev.totalWon + userWonThisRound,
       totalLost: prev.totalLost + chipsLostThisRound,
-      roundsHistory: [...prev.roundsHistory, roundSummary]
+      roundsHistory: [...prev.roundsHistory, roundSummary],
     }));
 
     setRoundResult({
@@ -128,15 +116,19 @@ export default function TypeBetting({ onBackToHub }) {
       correctIdx,
       aiPlacedCorrect,
       userPlacedCorrect,
-      multiplierText: aiPlacedCorrect === 0 ? 'x3 (¡Triplicado en su cara!)' : aiPlacedCorrect === 2 ? 'x2 (Duplicado limpio)' : 'x1.5 (Redondeo ↑ con desprecio)'
+      multiplierText:
+        aiPlacedCorrect === 0
+          ? 'x3 (¡Triplicado en su cara!)'
+          : aiPlacedCorrect === 2
+          ? 'x2 (Duplicado limpio)'
+          : 'x1.5 (Redondeo arriba)',
     });
 
-    // Verificar condición de fin:
-    // "El juego acaba al finalizar 10 rondas, o que el usuario acabe sin fichas."
     if (round >= maxRounds || newChips < 5) {
       setRoundStatus('gameover');
       if (newChips >= 15) {
-        confetti({ particleCount: 70, spread: 70, origin: { y: 0.6 } });
+        sfx.fanfare();
+        confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
       }
     } else {
       setRoundStatus('revealed');
@@ -144,300 +136,343 @@ export default function TypeBetting({ onBackToHub }) {
   };
 
   const handleNextRound = () => {
-    setRound(prev => prev + 1);
+    sfx.click();
+    setRound((prev) => prev + 1);
     loadRound();
   };
 
   if (!currentRoundData) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full" />
+      <div className="flex items-center justify-center min-h-[360px]">
+        <div className="arcade-panel rounded-2xl px-6 py-4 font-mono font-extrabold text-sm">
+          Repartiendo fichas del casino...
+        </div>
       </div>
     );
   }
 
-  const targetStyle = TYPE_COLORS[currentRoundData.targetType] || { bg: '#10B981', text: '#fff' };
-  const targetGradient = targetStyle.bgGradientCss || 'linear-gradient(135deg, #064e3b 0%, #022c22 100%)';
+  const targetStyle = TYPE_COLORS[currentRoundData.targetType] || TYPE_COLORS.Dark;
 
   return (
-    <div className="w-full max-w-5xl mx-auto flex flex-col items-center gap-6 py-4 px-4 animate-fadeIn">
+    <div className="w-full max-w-5xl mx-auto flex flex-col gap-5 animate-fadeIn">
       
-      {/* BARRA SUPERIOR CON FICHAS Y RONDAS */}
-      <div className="w-full flex flex-wrap items-center justify-between gap-4 bg-[#101426] border border-emerald-500/30 p-4 rounded-2xl shadow-xl backdrop-blur-md">
+      {/* HUD SUPERIOR */}
+      <div className="arcade-panel rounded-2xl p-3.5 sm:p-4 flex flex-wrap items-center justify-between gap-3">
         <button
-          onClick={onBackToHub}
-          className="text-xs font-black text-emerald-300 hover:text-white flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-emerald-500/30 hover:border-emerald-400 transition-colors cursor-pointer"
+          onClick={() => {
+            sfx.click();
+            onBackToHub();
+          }}
+          className="arcade-btn bg-white hover:bg-[#F3EFE2] text-[#111827] px-3.5 py-2 rounded-xl font-display font-extrabold text-xs uppercase cursor-pointer"
         >
-          ← Salir del Casino
+          ← Al Núcleo
         </button>
 
-        <span className="text-xs uppercase tracking-wider font-extrabold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-xl border border-emerald-500/20">
-          Casino Clandestino • El tipo sí importa
+        <span className="arcade-stamp bg-[#111827] text-[#FFD43B] px-3 py-1 rounded-xl font-mono text-xs font-extrabold uppercase">
+          MODO 03 • EL TIPO SÍ IMPORTA, NO JODAS
         </span>
 
-        <div className="flex items-center gap-4 text-xs font-bold">
-          <div className="bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl text-slate-300">
-            Ronda: <span className="text-white font-black">{round}</span> / {maxRounds}
+        <div className="flex items-center gap-2 font-mono text-xs font-extrabold">
+          <div className="bg-white border-2 border-[#111827] px-3 py-1.5 rounded-xl">
+            RONDA {round}/{maxRounds}
           </div>
-          <div className="bg-amber-500/20 border border-amber-500/40 px-3.5 py-1.5 rounded-xl text-amber-300 flex items-center gap-1.5">
-            <span>🪙</span> Fichas Vivas: <span className="text-amber-300 font-black text-sm">{chips}</span>
+          <div className="bg-[#FFD43B] border-2 border-[#111827] px-3.5 py-1.5 rounded-xl text-[#111827]">
+            FICHAS: <span className="text-sm">{chips}</span>
           </div>
         </div>
       </div>
 
-      {/* ENUNCIADO DE LA MISIÓN CON EL TIPO OBJETIVO */}
-      <div className="text-center my-1">
-        <span className="text-[11px] font-black uppercase tracking-widest text-emerald-400/80 bg-emerald-950/60 px-3 py-0.5 rounded-full border border-emerald-500/30">
-          Tipo Objetivo a Buscar
-        </span>
-        <div className="inline-flex items-center gap-3 mt-2 p-2 rounded-2xl border border-white/20 shadow-2xl" style={{ background: targetGradient }}>
-          <div className="w-10 h-10 rounded-xl bg-black/30 flex items-center justify-center p-1.5">
-            <TypeIcon type={currentRoundData.targetType} className="w-7 h-7" />
-          </div>
-          <span className="text-2xl md:text-3xl font-black px-4 py-1 text-white uppercase tracking-wider drop-shadow">
-            Tipo {currentRoundData.targetType}
-          </span>
+      {/* CARTEL DE SE BUSCA (TIPO OBJETIVO + TABLA DE MULTIPLICADORES) */}
+      <div
+        className="rounded-3xl border-[3px] border-[#111827] shadow-ink-lg p-5 text-white relative overflow-hidden"
+        style={{ background: targetStyle.bgGradientCss }}
+      >
+        <div className="absolute inset-0 bg-halftone-light opacity-50 pointer-events-none" />
+        <div className="absolute -right-6 -bottom-6 opacity-20 pointer-events-none">
+          <TypeIcon type={currentRoundData.targetType} size={170} />
         </div>
-        <p className="text-xs text-slate-300 mt-2 max-w-xl mx-auto font-medium">
-          Sólo 1 de estos 3 bichos lleva la esencia del tipo <strong>{currentRoundData.targetType}</strong>. Los otros dos son pura farsa. Suelta tus <strong>5 fichas</strong> sabiamente o prepárate para quedar pelado.
-        </p>
+
+        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-2xl bg-[#FFFDF7] border-[3px] border-[#111827] shadow-ink flex items-center justify-center shrink-0">
+              <TypeIcon type={currentRoundData.targetType} size={42} />
+            </div>
+            <div>
+              <span className="font-mono text-[10px] font-extrabold uppercase bg-[#111827] text-[#FFD43B] px-2 py-0.5 rounded">
+                TIPO BUSCADO ESTA RONDA
+              </span>
+              <h2 className="font-display font-extrabold text-2xl sm:text-4xl uppercase drop-shadow-sm mt-0.5">
+                TIPO {TYPE_ES[currentRoundData.targetType] || currentRoundData.targetType}
+              </h2>
+              <p className="text-xs font-semibold text-white/95 max-w-md mt-0.5">
+                Solo 1 de los 3 bichos tiene este tipo. Reparte tus 5 fichas. La IA siempre tira 3 a su favorita y 2 a la segunda.
+              </p>
+            </div>
+          </div>
+
+          {/* CHEAT SHEET DE MULTIPLICADORES */}
+          <div className="bg-[#FFFDF7] text-[#111827] border-[2.5px] border-[#111827] rounded-2xl p-3 shadow-ink-sm font-mono text-[11px] font-extrabold space-y-1 shrink-0 w-full md:w-auto">
+            <div className="text-[10px] text-[#D9383A] uppercase border-b border-slate-300 pb-1 mb-1">
+              PAGOS SI ACIERTAS
+            </div>
+            <div className="flex justify-between gap-4">
+              <span>IA puso 0 fichas:</span>
+              <span className="text-[#15803D]">x3 (TRIPLE)</span>
+            </div>
+            <div className="flex justify-between gap-4">
+              <span>IA puso 2 fichas:</span>
+              <span className="text-[#2563EB]">x2 (DOBLE)</span>
+            </div>
+            <div className="flex justify-between gap-4">
+              <span>IA puso 3 fichas:</span>
+              <span className="text-[#D97706]">x1.5 (REDONDEO ↑)</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* PANEL DE APUESTA DE FICHAS RESTANTES */}
+      {/* BARRA DE CONTROL DE APUESTA */}
       {roundStatus === 'betting' && (
-        <div className="w-full bg-[#121629] border-2 border-emerald-500/30 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 text-xs">
-          <div className="flex items-center gap-2">
-            <span className="text-lg">🪙</span>
-            <span className="text-slate-200 font-bold">
-              Fichas listas para tirar en este asalto: <strong className={`text-base font-black ${remainingToPlace === 0 ? 'text-emerald-400' : 'text-amber-400'}`}>{remainingToPlace} / 5</strong>
+        <div className="arcade-panel rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1">
+              {[0, 1, 2, 3, 4].map((slot) => (
+                <span
+                  key={slot}
+                  className={`w-6 h-6 rounded-full border-2 border-[#111827] inline-block transition-all ${
+                    slot < remainingToPlace ? 'bg-[#FFD43B] shadow-ink-sm' : 'bg-slate-200 opacity-40'
+                  }`}
+                />
+              ))}
+            </div>
+            <span className="font-mono text-xs font-extrabold text-[#111827]">
+              POR COLOCAR: <strong className="text-[#D9383A] text-sm">{remainingToPlace} / 5</strong>
             </span>
           </div>
 
           <button
             disabled={totalBet !== 5}
             onClick={handleConfirmBets}
-            className={`py-2.5 px-6 rounded-xl font-black text-xs uppercase tracking-wider transition-all cursor-pointer ${
-              totalBet === 5
-                ? 'bg-gradient-to-r from-emerald-400 to-teal-400 text-slate-950 shadow-lg shadow-emerald-500/30 hover:from-emerald-300 hover:to-teal-300 active:scale-95 border border-emerald-200'
-                : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
+            className={`arcade-btn px-5 py-2.5 rounded-xl font-display font-extrabold text-xs sm:text-sm uppercase cursor-pointer ${
+              totalBet === 5 ? 'bg-[#16A34A] text-white' : 'bg-slate-200 text-slate-500'
             }`}
           >
-            {totalBet === 5 ? '🔥 ¡Soltar las 5 fichas y ver si la IA llora!' : `Faltan colocar ${remainingToPlace} fichas`}
+            {totalBet === 5 ? '¡Soltar las 5 Fichas y Destapar!' : `Te faltan ${remainingToPlace} fichas`}
           </button>
         </div>
       )}
 
-      {/* LAS 3 OPCIONES DE POKÉMON */}
-      <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* LAS 3 CARTAS CANDIDATAS */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {currentRoundData.options.map((pokemon, idx) => {
           const isCorrect = pokemon.isCorrect;
           const userBet = userBets[idx];
           const aiBet = aiBets[idx];
           const isRevealed = roundStatus !== 'betting';
-          const cardGradient = TYPE_COLORS[pokemon.type1]?.bgGradientCss || 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)';
-
-          let borderStyle = 'border-slate-700 hover:border-emerald-400/60';
-          if (isRevealed) {
-            borderStyle = isCorrect ? 'border-emerald-400 shadow-[0_0_25px_rgba(16,185,129,0.5)]' : 'border-rose-900/60 opacity-60';
-          }
+          const pokeTheme = TYPE_COLORS[pokemon.type1] || TYPE_COLORS.Normal;
 
           return (
             <div
               key={pokemon.id}
-              className={`border-2 ${borderStyle} rounded-3xl p-5 flex flex-col justify-between shadow-xl relative transition-all`}
-              style={{ background: isRevealed && isCorrect ? cardGradient : '#13182c' }}
+              className={`rounded-3xl border-[3px] border-[#111827] shadow-ink-lg p-4 flex flex-col justify-between relative overflow-hidden transition-all ${
+                isRevealed
+                  ? isCorrect
+                    ? 'ring-4 ring-[#4ADE80]'
+                    : 'opacity-75'
+                  : 'bg-[#FFFDF7]'
+              }`}
+              style={{
+                background: isRevealed && isCorrect ? pokeTheme.bgGradientCss : '#FFFDF7',
+              }}
             >
-              {/* Insignia de acierto en revelación */}
-              {isRevealed && (
-                <div className={`absolute top-3 right-3 text-[10px] font-black px-2.5 py-1 rounded-full text-white shadow-md flex items-center gap-1 ${
-                  isCorrect ? 'bg-emerald-600 border border-emerald-300' : 'bg-slate-800 text-slate-400'
-                }`}>
-                  {isCorrect ? (
-                    <>
-                      <TypeIcon type={currentRoundData.targetType} className="w-3 h-3 fill-current" />
-                      <span>¡Es el bicho real!</span>
-                    </>
-                  ) : (
-                    <span>❌ Este no tiene ni pizca</span>
-                  )}
-                </div>
-              )}
-
-              {/* Imagen y Nombre */}
-              <div className="flex flex-col items-center">
-                <span className="text-[10px] font-mono text-slate-400 mb-1">
-                  Opción {idx + 1} • #{pokemon.id.toString().padStart(3, '0')}
+              {/* Insignia de estado */}
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <span className="font-mono text-[10px] font-extrabold bg-[#111827] text-white px-2 py-0.5 rounded">
+                  OPCIÓN #{idx + 1}
                 </span>
-                <div className="w-36 h-36 flex items-center justify-center my-2 bg-black/20 rounded-2xl p-2">
-                  <img 
-                    src={pokemon.image} 
+                {isRevealed && (
+                  <span
+                    className={`arcade-stamp font-mono text-[10px] font-extrabold px-2 py-0.5 rounded-lg uppercase ${
+                      isCorrect ? 'bg-[#4ADE80] text-[#111827]' : 'bg-[#FFE3E3] text-[#991B1B]'
+                    }`}
+                  >
+                    {isCorrect ? '¡EL VERDADERO!' : 'PURA FARSA'}
+                  </span>
+                )}
+              </div>
+
+              {/* Imagen y nombre */}
+              <div className="bg-white border-2 border-[#111827] rounded-2xl p-3 flex flex-col items-center shadow-ink-sm">
+                <div className="w-32 h-32 flex items-center justify-center">
+                  <img
+                    src={pokemon.image}
                     alt={pokemon.name}
                     onError={(e) => { e.target.src = pokemon.thumbnail; }}
-                    className="max-w-full max-h-full object-contain filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.8)]"
+                    className="max-w-full max-h-full object-contain drop-shadow"
                   />
                 </div>
-                <h4 className="text-lg font-black text-white text-center mt-1">{pokemon.name}</h4>
+                <h4 className="font-display font-extrabold text-lg text-[#111827] text-center mt-1.5">
+                  {pokemon.name}
+                </h4>
 
-                {/* Tipos del Pokémon (revelados al final de ronda) */}
                 {isRevealed && (
-                  <div className="flex gap-1.5 mt-2">
-                    <span 
-                      className="text-[10px] font-black px-2 py-0.5 rounded-lg text-white flex items-center gap-1 shadow"
-                      style={{ backgroundColor: TYPE_COLORS[pokemon.type1]?.bg || '#666' }}
-                    >
-                      <TypeIcon type={pokemon.type1} className="w-3 h-3 fill-current" />
-                      {pokemon.type1}
+                  <div className="flex flex-wrap justify-center gap-1 mt-1.5">
+                    <span className="arcade-stamp bg-[#FFFDF7] text-[#111827] text-[10px] font-extrabold px-2 py-0.5 rounded-md flex items-center gap-1">
+                      <TypeIcon type={pokemon.type1} size={12} />
+                      {TYPE_ES[pokemon.type1] || pokemon.type1}
                     </span>
                     {pokemon.type2 && (
-                      <span 
-                        className="text-[10px] font-black px-2 py-0.5 rounded-lg text-white flex items-center gap-1 shadow"
-                        style={{ backgroundColor: TYPE_COLORS[pokemon.type2]?.bg || '#666' }}
-                      >
-                        <TypeIcon type={pokemon.type2} className="w-3 h-3 fill-current" />
-                        {pokemon.type2}
+                      <span className="arcade-stamp bg-[#FFFDF7] text-[#111827] text-[10px] font-extrabold px-2 py-0.5 rounded-md flex items-center gap-1">
+                        <TypeIcon type={pokemon.type2} size={12} />
+                        {TYPE_ES[pokemon.type2] || pokemon.type2}
                       </span>
                     )}
                   </div>
                 )}
               </div>
 
-              {/* CONTROLES DE FICHAS DE USUARIO Y FICHAS DE IA */}
-              <div className="mt-4 pt-3 border-t border-slate-800 space-y-3">
-                {/* Fichas IA */}
+              {/* Pila de fichas y botones */}
+              <div className="mt-3 space-y-2.5">
                 {isRevealed && (
-                  <div className="bg-purple-950/60 border border-purple-500/30 p-2 rounded-xl flex items-center justify-between text-xs text-purple-200">
-                    <span>🤖 Fichas de la IA:</span>
-                    <span className="font-black text-white bg-purple-900/80 px-2 py-0.5 rounded">
-                      {aiBet} fichas
-                    </span>
+                  <div className="bg-[#111827] text-white rounded-xl px-3 py-2 flex items-center justify-between font-mono text-xs font-extrabold">
+                    <span className="text-slate-300">APUESTA IA:</span>
+                    <span className="text-[#FFD43B]">{aiBet} FICHAS</span>
                   </div>
                 )}
 
-                {/* Fichas Usuario */}
-                <div className="bg-slate-900/90 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
-                  <span className="text-xs text-slate-300 font-bold">Tu Apuesta:</span>
-                  <span className="text-base font-black text-amber-400">
-                    🪙 {userBet}
-                  </span>
+                <div className="bg-[#FFF9DB] border-2 border-[#111827] rounded-xl px-3 py-2 flex items-center justify-between">
+                  <span className="font-mono text-xs font-extrabold text-[#111827]">TUS FICHAS:</span>
+                  <div className="flex items-center gap-1.5">
+                    <div className="flex -space-x-1.5">
+                      {Array.from({ length: userBet }).map((_, i) => (
+                        <span
+                          key={i}
+                          className="w-4 h-4 rounded-full bg-[#FFD43B] border-[1.5px] border-[#111827] inline-block"
+                        />
+                      ))}
+                    </div>
+                    <span className="font-mono text-base font-extrabold text-[#D9383A] ml-1">
+                      {userBet}
+                    </span>
+                  </div>
                 </div>
 
-                {/* Botones de apuesta mientras se juega */}
                 {roundStatus === 'betting' && (
-                  <div className="flex gap-2">
+                  <div className="grid grid-cols-3 gap-1.5">
                     <button
                       onClick={() => handleAddBet(idx, -1)}
                       disabled={userBet <= 0}
-                      className="flex-1 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                      className="arcade-btn bg-white hover:bg-slate-100 text-[#111827] py-2 rounded-xl font-mono font-extrabold text-xs cursor-pointer"
                     >
                       -1
                     </button>
                     <button
                       onClick={() => handleAddBet(idx, 1)}
                       disabled={remainingToPlace <= 0}
-                      className="flex-1 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                      className="arcade-btn bg-[#16A34A] hover:bg-[#15803D] text-white py-2 rounded-xl font-mono font-extrabold text-xs cursor-pointer"
                     >
                       +1
                     </button>
                     <button
                       onClick={() => handlePlaceAllOn(idx)}
-                      className="py-1.5 px-3 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[10px] uppercase cursor-pointer"
+                      className="arcade-btn bg-[#FFD43B] hover:bg-[#FFE066] text-[#111827] py-2 rounded-xl font-mono font-extrabold text-[11px] uppercase cursor-pointer"
                     >
-                      ALL-IN
+                      ALL 5
                     </button>
                   </div>
                 )}
               </div>
-
             </div>
           );
         })}
       </div>
 
-      {/* FEEDBACK Y RESULTADO DE LA RONDA */}
+      {/* RESULTADO DE LA RONDA */}
       {roundResult && roundStatus === 'revealed' && (
-        <div className="w-full bg-[#121629] border-2 border-slate-700 p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 animate-fadeIn shadow-2xl">
+        <div className="arcade-panel rounded-2xl p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4 animate-popIn">
           <div>
-            <h4 className="text-base font-black text-white">
+            <h4 className="font-display font-extrabold text-lg text-[#111827]">
               {roundResult.userWonThisRound > 0
-                ? `🎉 ¡Te llevaste +${roundResult.userWonThisRound} fichas limpias!`
-                : '💀 No le pusiste ni una ficha al bicho que era. Las perdiste.'}
+                ? `¡Te embolsaste +${roundResult.userWonThisRound} fichas limpias!`
+                : 'No pusiste ni una ficha en el bicho real. Perdiste la apuesta.'}
             </h4>
-            <p className="text-xs text-slate-300 mt-1 font-medium">
-              Multiplicador: <strong className="text-amber-400">{roundResult.multiplierText}</strong>. La IA había colocado {roundResult.aiPlacedCorrect} fichas en la opción ganadora.
+            <p className="font-mono text-xs font-bold text-slate-700 mt-0.5">
+              Multiplicador: <span className="text-[#D9383A]">{roundResult.multiplierText}</span> • La IA puso {roundResult.aiPlacedCorrect} fichas en la correcta.
             </p>
           </div>
 
           <button
             onClick={handleNextRound}
-            className="py-3 px-6 rounded-xl font-black text-xs uppercase text-slate-950 bg-gradient-to-r from-emerald-400 to-teal-300 hover:from-emerald-300 hover:to-teal-200 shadow-lg shadow-emerald-500/30 cursor-pointer"
+            className="arcade-btn bg-[#111827] hover:bg-[#1E3A5F] text-[#FFD43B] px-5 py-3 rounded-xl font-display font-extrabold text-sm uppercase cursor-pointer"
           >
             Siguiente Ronda ({round + 1}/{maxRounds}) →
           </button>
         </div>
       )}
 
-      {/* REPORTE FINAL: 10 RONDAS O SIN FICHAS */}
+      {/* REPORTE FINAL (TICKET DEL CASINO CLANDESTINO) */}
       {roundStatus === 'gameover' && (
-        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fadeIn">
-          <div className="bg-[#121629] border-2 border-amber-500 rounded-3xl p-6 md:p-8 max-w-lg w-full text-center shadow-[0_0_50px_rgba(245,158,11,0.4)] overflow-y-auto max-h-[90vh]">
-            <span className="text-6xl block mb-2">{chips >= 15 ? '💰' : '📉'}</span>
-            <h3 className="text-3xl font-black text-amber-400 uppercase tracking-tight">
-              {chips >= 15 ? '¡Saliste Forrado del Casino!' : '¡Te dejaron en calzoncillos!'}
+        <div className="fixed inset-0 bg-[#111827]/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn">
+          <div className="arcade-panel rounded-3xl p-6 sm:p-8 max-w-lg w-full text-center max-h-[90vh] overflow-y-auto animate-popIn">
+            <span className="arcade-stamp inline-block bg-[#FFD43B] text-[#111827] font-mono text-xs font-extrabold uppercase px-3 py-1 rounded-lg -rotate-1 mb-2">
+              TICKET DEL CASINO CLANDESTINO
+            </span>
+            <h3 className="font-display font-extrabold text-2xl sm:text-3xl text-[#111827] uppercase">
+              {chips >= 15 ? '¡Saliste Forrado de Fichas!' : '¡Te Dejaron Pelado!'}
             </h3>
-            <p className="text-xs text-slate-300 mt-1 font-semibold">
-              {chips >= 5 ? 'Llegaste con vida al final de las 10 rondas de pura especulación.' : 'Te desplumaron las 15 fichas antes de llegar a la ronda 10.'}
+            <p className="text-xs font-semibold text-slate-700 mt-1">
+              {chips >= 5
+                ? 'Sobreviviste las 10 rondas completas contra la banca infinita de la IA.'
+                : 'Te quedaste con menos de 5 fichas para seguir apostando.'}
             </p>
 
-            {/* BALANCE TOTAL */}
-            <div className="grid grid-cols-3 gap-2 my-5 p-4 rounded-2xl bg-slate-900 border border-slate-800 text-center">
-              <div>
-                <span className="text-[10px] text-slate-400 uppercase font-bold block">Fichas Ganadas</span>
-                <span className="text-xl font-black text-emerald-400">+{report.totalWon}</span>
+            <div className="grid grid-cols-3 gap-2 my-5">
+              <div className="bg-[#EBFBEE] border-2 border-[#111827] rounded-xl p-3">
+                <span className="font-mono text-[10px] font-bold uppercase text-slate-600 block">Ganadas</span>
+                <span className="font-display font-extrabold text-2xl text-[#15803D]">+{report.totalWon}</span>
               </div>
-              <div className="border-x border-slate-800 px-2">
-                <span className="text-[10px] text-slate-400 uppercase font-bold block">Fichas Perdidas</span>
-                <span className="text-xl font-black text-rose-400">-{report.totalLost}</span>
+              <div className="bg-[#FFE3E3] border-2 border-[#111827] rounded-xl p-3">
+                <span className="font-mono text-[10px] font-bold uppercase text-slate-600 block">Perdidas</span>
+                <span className="font-display font-extrabold text-2xl text-[#D9383A]">-{report.totalLost}</span>
               </div>
-              <div>
-                <span className="text-[10px] text-slate-400 uppercase font-bold block">Saldo Final</span>
-                <span className={`text-xl font-black ${chips >= 15 ? 'text-emerald-400' : 'text-amber-400'}`}>
-                  {chips}
-                </span>
+              <div className="bg-[#FFF9DB] border-2 border-[#111827] rounded-xl p-3">
+                <span className="font-mono text-[10px] font-bold uppercase text-slate-600 block">Saldo Final</span>
+                <span className="font-display font-extrabold text-2xl text-[#111827]">{chips}</span>
               </div>
             </div>
 
-            {/* TABLA HISTÓRICA RESUMEN */}
-            <div className="text-left mb-6 max-h-48 overflow-y-auto pr-1">
-              <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 mb-2 block">
-                Historial de apuestas:
+            <div className="text-left mb-5 max-h-44 overflow-y-auto space-y-1.5 pr-1">
+              <span className="font-mono text-[10px] font-extrabold uppercase text-slate-600 block">
+                Desglose ronda por ronda:
               </span>
-              <div className="space-y-1.5">
-                {report.roundsHistory.map((item, idx) => (
-                  <div key={idx} className="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800/80 text-xs flex justify-between items-center">
-                    <div>
-                      <span className="font-bold text-white">Ronda #{item.roundNumber} ({item.targetType}):</span>
-                      <span className="text-slate-400 ml-1.5 text-[11px]">{item.correctPokemon}</span>
-                    </div>
-                    <div className="text-right">
-                      <span className={item.userWonThisRound > 0 ? 'text-emerald-400 font-bold' : 'text-slate-500 font-bold'}>
-                        {item.userWonThisRound > 0 ? `+${item.userWonThisRound}` : '0'} 🪙
-                      </span>
-                    </div>
+              {report.roundsHistory.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="bg-[#F4EFE2] border border-[#111827]/40 rounded-xl px-3 py-2 flex items-center justify-between text-xs font-mono"
+                >
+                  <div className="truncate pr-2">
+                    <strong>R{item.roundNumber}</strong> ({TYPE_ES[item.targetType] || item.targetType}) — {item.correctPokemon}
                   </div>
-                ))}
-              </div>
+                  <span className={item.userWonThisRound > 0 ? 'text-[#15803D] font-extrabold' : 'text-slate-500 font-bold'}>
+                    {item.userWonThisRound > 0 ? `+${item.userWonThisRound}` : '0'}
+                  </span>
+                </div>
+              ))}
             </div>
 
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2.5">
               <button
                 onClick={startNewGame}
-                className="w-full py-4 rounded-xl font-black text-sm uppercase text-slate-950 bg-gradient-to-r from-amber-400 to-yellow-300 hover:from-amber-300 hover:to-yellow-200 shadow-lg shadow-amber-500/30 transition-all cursor-pointer"
+                className="arcade-btn w-full py-3.5 rounded-2xl bg-[#FFD43B] hover:bg-[#FFE066] text-[#111827] font-display font-extrabold text-sm uppercase cursor-pointer"
               >
-                🎰 Echar otra partida
+                Echar Otra Partida (15 Fichas)
               </button>
               <button
-                onClick={onBackToHub}
-                className="w-full py-2.5 rounded-xl font-bold text-xs text-slate-400 hover:text-white bg-slate-900 hover:bg-slate-800 transition-colors cursor-pointer"
+                onClick={() => {
+                  sfx.click();
+                  onBackToHub();
+                }}
+                className="arcade-btn w-full py-2.5 rounded-2xl bg-white hover:bg-slate-100 text-[#111827] font-bold text-xs uppercase cursor-pointer"
               >
                 Volver al Núcleo
               </button>
@@ -445,7 +480,6 @@ export default function TypeBetting({ onBackToHub }) {
           </div>
         </div>
       )}
-
     </div>
   );
 }

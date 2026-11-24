@@ -1,5 +1,5 @@
 import React from 'react';
-import logoImg from '../assets/Logo PokeMind CR.jpg';
+import logoImg from '../assets/logo-trimmed.png';
 import SvgEmoji from './SvgEmoji';
 
 export default function LoadPage({ onNavigate, onOpenLegal }) {
