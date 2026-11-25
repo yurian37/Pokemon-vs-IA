@@ -106,13 +106,12 @@ Flujo de diseño guiado por pasos con confirmación obligatoria entre secciones:
 
 ---
 
-## 📦 Modelos y Archivos de Machine Learning
+## 📦 Modelos y Archivos de Machine Learning Integrados
 
-- **Modelo de Keras Multicapa**: `backend-java/Models IA/best_pokemon_model.keras`
-- **Codificador One-Hot**: `backend-java/Encoders_Scalers/pokemon_encoder.joblib`
-- **Escalador MinMax**: `backend-java/Encoders_Scalers/pokemon_scaler.joblib`
-- **Base de Datos Pokedex**: `backend-java/database_pokedex/pokedex.xlsx` (1,215 Pokémon indexados)
-- **Notebook de Referencia**: `Proyecto_Final_de_Módulo_Pablo_Valenciano.ipynb`
+La aplicación web opera de manera 100% autónoma en el cliente web (`frontend-react`):
+- **Pesos de la Red Neuronal, Codificador y Escalador**: `frontend-react/src/data/kerasModelWeights.json`
+- **Base de Datos Pokédex Optimizada**: `frontend-react/src/data/pokemonData.json` (1,215 Pokémon con estadísticas oficiales, tipos y mapeo de sprites de PokéAPI)
+- **Motor de Inferencia y KNN**: `frontend-react/src/services/mlModelsService.js` (cálculo de pertenencia espectral y KNN con k=5 ponderado)
 - **Fuente de Imágenes**: [PokéAPI Oficial (GitHub Artwork Sprites)](https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/)
 
 ---
